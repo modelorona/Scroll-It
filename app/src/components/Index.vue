@@ -43,56 +43,67 @@
             </v-row>
         </v-container>
 
+        <v-container>
         <!--        insert play button -->
+        <v-btn type="primary" @click="showSlideshow">
+            Play Slideshow
+        </v-btn>
+
+        </v-container>
+
+        <FsLightbox
+            :toggler="toggler" type="image"
+            :sources="posts.map(v => v.src)"
+            :key="index"
+        >
+        </FsLightbox>
 
         <v-container fluid>
             <v-row dense :align-content="'center'" :justify="'center'">
-                <v-col v-for="post in posts" :key="post.title" md="4" lg="4" sm="8">
-                    <v-card @click.stop="enlargePhoto(post)">
+                <v-col v-for="post in posts" :key="post.title" md="4" lg="4" sm="8" :align-self="'center'">
+                    <v-card @click="enlargePhoto(post)">
                         <v-img :src="post.src" :alt="'Change this later on'"></v-img>
-                        <!--                        <v-card-title v-text="post.title"></v-card-title>-->
+
                     </v-card>
                 </v-col>
             </v-row>
-        </v-container>
 
-        <v-dialog
-            v-model="overlay"
-        >
-<!--            <v-overlay-->
-<!--                :absolute="absolute"-->
-<!--                :opacity="opacity"-->
-<!--                :value="overlay"-->
-<!--                :z-index="zIndex"-->
-<!--            >-->
+            <v-overlay v-on:click.native="closeOverlay($event)" v-esc="()=>this.overlay=false"
+                :absolute="absolute"
+                :opacity="opacity"
+                :value="overlay"
+                :z-index="zIndex"
+            >
                 <v-icon @click="overlay=false" class="float-right">mdi-close</v-icon>
-                <v-img :src="currentImage" :height="'100%'" :width="'100%'">
+                <v-img :src="currentImage" :height="'100%'" :width="'100%'"></v-img>
 
-                </v-img>
-<!--            </v-overlay>-->
-        </v-dialog>
+            </v-overlay>
+        </v-container>
 
 
     </div>
 </template>
 
 <script>
-    import snoowrap from 'snoowrap'
+    import snoowrap from 'snoowrap';
+    import FsLightbox from "fslightbox-vue";
 
     export default {
         name: 'Index',
-
+        components: {FsLightbox},
         data: () => ({
             absolute: false,
             opacity: 0.99,
             zIndex: 5,
             overlay: false,
             currentImage: '',
+            toggler: false,
+            index: 0,
             posts: [
                 {title: 'Test title', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 6},
-                {title: 'Test title2', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 6},
-                {title: 'Test title3', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 6},
-                {title: 'Test title4', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 6}
+                {title: 'Test title2', src: 'https://cdn.eso.org/images/thumb300y/eso1907a.jpg', flex: 6},
+                {title: 'Test title3', src: 'https://media3.s-nbcnews.com/j/newscms/2019_41/3047866/191010-japan-stalker-mc-1121_06b4c20bbf96a51dc8663f334404a899.fit-760w.JPG', flex: 6},
+                {title: 'Test title4', src: 'https://thumbs-prod.si-cdn.com/tJgHlc1OgfZ1saGEq5xGVNQgoMA=/420x240/https://public-media.si-cdn.com/filer/90/b2/90b2dfe5-a9ab-4821-9ccc-45ae1d52fa8a/blackholewithclouds_c-1-941x519.jpg', flex: 6}
             ],
             label: 'Enter subreddit name',
             text: '',
@@ -109,19 +120,52 @@
         }),
 
         methods: {
-            test() {
-                console.log('hi');
+            test(evt) {
+                console.log(evt);
+            },
+            drawToolbar() {
+                this.$nextTick(() => {
+                    // let element = `<div title="Enter fullscreen" class="fslightbox-toolbar-button fslightbox-flex-centered"><svg width="20px" height="20px" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z" class="fslightbox-svg-path"></path></svg></div>`;
+                    let toolbar = document.getElementsByClassName('fslightbox-toolbar').item(0);
+                    toolbar.innerHTML = '';
+                    let iconDiv = document.createElement('div');
+                    iconDiv.classList.add('fslightbox-toolbar-button', 'fslightbox-flex-centered');
+                    iconDiv.title = 'Enter fullscreen';
+
+                    let iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    iconSvg.setAttribute('viewBox', '0 0 18 18');
+                    iconSvg.setAttribute('width', '20px');
+                    iconSvg.setAttribute('height', '20px');
+
+                    let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', 'M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z');
+                    path.classList.add('fslightbox-svg-path');
+
+                    iconSvg.appendChild(path);
+                    iconDiv.appendChild(iconSvg);
+                    toolbar.appendChild(iconDiv);
+                })
+            },
+            closeOverlay(evt) {
+                // maybe hacky way to do this
+                const classname = evt.path[0].className;
+                if (classname === 'v-overlay__scrim') {
+                    this.overlay = false;
+                }
+            },
+            showSlideshow() {
+                this.toggler = !this.toggler;
+                this.drawToolbar();
             },
             enlargePhoto(evt) {
-                console.log(evt);
                 this.currentImage = evt.src;
                 this.overlay = true;
             },
             getSubreddit() {
-                this.r.getSubreddit(this.text).getNew().then(content => console.log(content))
+                this.r.getSubreddit(this.text).getNew().then(content => console.log(content));
             },
             clearText() {
-                this.text = ''
+                this.text = '';
             }
         }
     }
