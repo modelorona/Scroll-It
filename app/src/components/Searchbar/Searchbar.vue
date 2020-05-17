@@ -16,14 +16,6 @@
                         </v-btn>
                     </template>
                     <v-card>
-                        <v-list>
-                            <v-list-item>
-                                <v-list-item-action>
-                                    <v-switch v-model="nsfw" color="green"></v-switch>
-                                </v-list-item-action>
-                                <v-list-item-title>Show NSFW Content</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
                         <v-select
                             :items="postTypeOptions"
                             filled v-model="postType"
@@ -31,7 +23,7 @@
                         ></v-select>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" text @click="menu = false">Save</v-btn>
+                            <v-btn color="primary" text @click="menu = false">Close</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-menu>
@@ -50,7 +42,6 @@
         data: () => ({
             postType: 'Hot',
             postTypeOptions: ['Hot', 'New', 'Top'],
-            nsfw: false,
             label: 'Enter subreddit name',
             menu: false,
             postTypeLabel: 'Choose post type',
@@ -59,10 +50,10 @@
 
         methods: {
             clearText() {
-                this.text = '';
+                this.$emit('cleartext');
             },
             getSubreddit(){
-                this.$emit('getSubreddit', this.text, this.postType, this.nsfw);
+                this.$emit('getSubreddit', this.text, this.postType, false);
             },
         }
     }

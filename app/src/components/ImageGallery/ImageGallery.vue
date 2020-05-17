@@ -20,7 +20,7 @@
         </v-overlay>
     </v-container>
 </template>
-
+<!--todo: must compress these images, show them smaller, thumbail, or use some other element-->
 <script>
     export default {
         name: "ImageGallery",

@@ -10,7 +10,7 @@
         <FsLightbox id="lightbox"
                     :toggler="toggler" type="image"
                     :sources="posts.map(v => v.src)"
-                    :key="index"
+                    :key="this.$props.index"
         >
         </FsLightbox>
     </div>
@@ -30,12 +30,15 @@
             posts: {
                 type: Array,
                 required: true
+            },
+            index: {
+                type: Number,
+                required: true
             }
         },
 
         data: () => ({
             toggler: false,
-            index: 0,
             galleryPlaying: false,
         }),
 
