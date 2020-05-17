@@ -120,70 +120,6 @@
         }),
 
         computed: {
-            fullscreenIcon() {
-                let iconDiv = document.createElement('div');
-                iconDiv.classList.add('fslightbox-toolbar-button', 'fslightbox-flex-centered');
-                iconDiv.title = 'Enter fullscreen';
-
-                let iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                iconSvg.setAttribute('viewBox', '0 0 18 18');
-                iconSvg.setAttribute('width', '20px');
-                iconSvg.setAttribute('height', '20px');
-
-                let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('d', 'M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z');
-                path.classList.add('fslightbox-svg-path');
-
-                iconDiv.addEventListener('click', function(event) {
-                    if (document.fullscreenEnabled) {
-                        if (document.fullscreenElement === null) {
-                            // request fullscreen
-                            const documentElement = document.documentElement;
-                            if (documentElement.requestFullscreen) {
-                                documentElement.requestFullscreen();
-                            } else if (documentElement.mozRequestFullScreen) {
-                                documentElement.mozRequestFullScreen();
-                            } else if (documentElement.webkitRequestFullscreen) {
-                                documentElement.webkitRequestFullscreen();
-                            } else if (documentElement.msRequestFullscreen) {
-                                documentElement.msRequestFullscreen();
-                            }
-                            this.title = 'Exit Fullscreen';
-                            let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
-                            let svgElement = this.childNodes.item(0);
-
-                            svgElement.setAttribute('viewBox', '0 0 950 1024');
-                            svgElement.setAttribute('width', '24px');
-                            svgElement.setAttribute('height', '24px');
-                            pathElement.setAttribute('d', 'M682 342h128v84h-212v-212h84v128zM598 810v-212h212v84h-128v128h-84zM342 342v-128h84v212h-212v-84h128zM214 682v-84h212v212h-84v-128h-128z');
-                        } else {
-                            // close fullscreen
-                            if (document.exitFullscreen) {
-                                document.exitFullscreen();
-                            } else if (document.mozCancelFullScreen) {
-                                document.mozCancelFullScreen();
-                            } else if (document.webkitExitFullscreen) {
-                                document.webkitExitFullscreen();
-                            } else if (document.msExitFullscreen) {
-                                document.msExitFullscreen();
-                            }
-                            this.title = 'Enter Fullscreen';
-                            let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
-                            let svgElement = this.childNodes.item(0);
-
-                            svgElement.setAttribute('viewBox', '0 0 18 18');
-                            svgElement.setAttribute('width', '20px');
-                            svgElement.setAttribute('height', '20px');
-                            pathElement.setAttribute('d', 'M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z');
-                        }
-                    }
-                }, false);
-
-                iconSvg.appendChild(path);
-                iconDiv.appendChild(iconSvg);
-
-                return iconDiv;
-            },
             playPauseIcon() {
                 let iconDiv = document.createElement('div');
                 iconDiv.classList.add('fslightbox-toolbar-button', 'fslightbox-flex-centered');
@@ -237,7 +173,6 @@
             drawToolbar() {
                 this.$nextTick(() => {
                     let toolbar = document.getElementsByClassName('fslightbox-toolbar').item(0);
-                    // toolbar.replaceChild(this.fullscreenIcon, toolbar.childNodes.item(0));
                     toolbar.insertBefore(this.playPauseIcon, toolbar.firstChild);
                 })
             },
