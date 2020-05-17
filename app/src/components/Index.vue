@@ -1,48 +1,6 @@
 <template>
     <div>
-        <v-container>
-            <v-row :align-content="'center'" :justify="'center'">
-                <v-col cols="8">
-                    <v-text-field outlined :label="this.label" filled v-model="text" dense
-                                  clear-icon="mdi-close-circle" clearable class="ml-1 mr-1"
-                                  type="text" @click:clear="clearText" :hint="this.label + ' that you wish to search for.'"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                    <v-menu v-model="menu" :close-on-content-click="false">
-
-                        <template v-slot:activator="{ on }">
-                            <v-btn icon large ripple small type="button" v-on="on">
-                                <v-icon>mdi-wrench</v-icon>
-                            </v-btn>
-                        </template>
-                        <v-card>
-                            <v-list>
-                                <v-list-item>
-                                    <v-list-item-action>
-                                        <v-switch v-model="nsfw" color="green"></v-switch>
-                                    </v-list-item-action>
-                                    <v-list-item-title>Show NSFW Content</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                            <v-select
-                                :items="postTypeOptions"
-                                filled v-model="postType"
-                                label="Choose post type"
-                            ></v-select>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="primary" text @click="menu = false">Save</v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-menu>
-                    <v-btn icon large ripple type="submit" @click="getSubreddit">
-                        <v-icon>mdi-send</v-icon>
-                    </v-btn>
-                </v-col>
-            </v-row>
-        </v-container>
-
+        <Searchbar @getSubreddit="getSubreddit"></Searchbar>
         <v-container>
         <!--        insert play button -->
         <v-btn type="primary" @click="showSlideshow">
@@ -86,10 +44,11 @@
 <script>
     import snoowrap from 'snoowrap';
     import FsLightbox from 'fslightbox-vue';
+    import Searchbar from "./Searchbar/Searchbar";
 
     export default {
         name: 'Index',
-        components: {FsLightbox},
+        components: {Searchbar, FsLightbox},
         data: () => ({
             absolute: false,
             opacity: 0.99,
@@ -104,12 +63,6 @@
                 {title: 'Test title3', src: 'https://media3.s-nbcnews.com/j/newscms/2019_41/3047866/191010-japan-stalker-mc-1121_06b4c20bbf96a51dc8663f334404a899.fit-760w.JPG', flex: 6},
                 {title: 'Test title4', src: 'https://thumbs-prod.si-cdn.com/tJgHlc1OgfZ1saGEq5xGVNQgoMA=/420x240/https://public-media.si-cdn.com/filer/90/b2/90b2dfe5-a9ab-4821-9ccc-45ae1d52fa8a/blackholewithclouds_c-1-941x519.jpg', flex: 6}
             ],
-            label: 'Enter subreddit name',
-            text: '',
-            menu: false,
-            nsfw: false,
-            postTypeOptions: ['Hot', 'New', 'Top'],
-            postType: 'Hot',
             r: new snoowrap({
                 userAgent: process.env.VUE_APP_USER_AGENT,
                 clientId: process.env.VUE_APP_CLIENT_ID,
@@ -191,12 +144,9 @@
                 this.currentImage = evt.src;
                 this.overlay = true;
             },
-            getSubreddit() {
-                this.r.getSubreddit(this.text).getNew().then(content => console.log(content));
+            getSubreddit(text, postType, nsfw) {
+                this.r.getSubreddit(text).getNew().then(content => console.log(content));
             },
-            clearText() {
-                this.text = '';
-            }
         }
     }
 </script>
