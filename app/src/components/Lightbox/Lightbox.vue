@@ -36,6 +36,7 @@
         data: () => ({
             toggler: false,
             index: 0,
+            galleryPlaying: false,
         }),
 
         computed: {
