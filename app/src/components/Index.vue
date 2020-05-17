@@ -10,21 +10,15 @@
 </template>
 
 <script>
-    import snoowrap from 'snoowrap';
     import Searchbar from "./Searchbar/Searchbar";
     import Lightbox from "./Lightbox/Lightbox";
     import ImageGallery from "./ImageGallery/ImageGallery";
+    import { getSubredditWithParams } from "../api/reddit";
 
     export default {
         name: 'Index',
         components: {ImageGallery, Searchbar, Lightbox},
         data: () => ({
-            r: new snoowrap({
-                userAgent: process.env.VUE_APP_USER_AGENT,
-                clientId: process.env.VUE_APP_CLIENT_ID,
-                clientSecret: process.env.VUE_APP_CLIENT_SECRET,
-                refreshToken: process.env.VUE_APP_REFRESH_TOKEN
-            }),
             posts: [
                 {title: 'Test title', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 6},
                 {title: 'Test title2', src: 'https://cdn.eso.org/images/thumb300y/eso1907a.jpg', flex: 6},
@@ -34,11 +28,8 @@
         }),
 
         methods: {
-            test(evt) {
-                console.log(evt);
-            },
             getSubreddit(text, postType, nsfw) {
-                this.r.getSubreddit(text).getNew().then(content => console.log(content));
+                getSubredditWithParams(text, postType, nsfw);
             },
         }
     }
