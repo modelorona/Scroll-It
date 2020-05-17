@@ -62,8 +62,7 @@
             <v-row dense :align-content="'center'" :justify="'center'">
                 <v-col v-for="post in posts" :key="post.title" md="4" lg="4" sm="8" :align-self="'center'">
                     <v-card @click="enlargePhoto(post)">
-                        <v-img :src="post.src" :alt="'Change this later on'"></v-img>
-
+                        <v-img :src="post.src" :alt="'Change this later on'" :key="post.src"></v-img>
                     </v-card>
                 </v-col>
             </v-row>
@@ -86,7 +85,7 @@
 
 <script>
     import snoowrap from 'snoowrap';
-    import FsLightbox from "fslightbox-vue";
+    import FsLightbox from 'fslightbox-vue';
 
     export default {
         name: 'Index',
@@ -117,7 +116,119 @@
                 clientSecret: process.env.VUE_APP_CLIENT_SECRET,
                 refreshToken: process.env.VUE_APP_REFRESH_TOKEN
             }),
+            galleryPlaying: false,
         }),
+
+        computed: {
+            fullscreenIcon() {
+                let iconDiv = document.createElement('div');
+                iconDiv.classList.add('fslightbox-toolbar-button', 'fslightbox-flex-centered');
+                iconDiv.title = 'Enter fullscreen';
+
+                let iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                iconSvg.setAttribute('viewBox', '0 0 18 18');
+                iconSvg.setAttribute('width', '20px');
+                iconSvg.setAttribute('height', '20px');
+
+                let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', 'M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z');
+                path.classList.add('fslightbox-svg-path');
+
+                iconDiv.addEventListener('click', function(event) {
+                    if (document.fullscreenEnabled) {
+                        if (document.fullscreenElement === null) {
+                            // request fullscreen
+                            const documentElement = document.documentElement;
+                            if (documentElement.requestFullscreen) {
+                                documentElement.requestFullscreen();
+                            } else if (documentElement.mozRequestFullScreen) {
+                                documentElement.mozRequestFullScreen();
+                            } else if (documentElement.webkitRequestFullscreen) {
+                                documentElement.webkitRequestFullscreen();
+                            } else if (documentElement.msRequestFullscreen) {
+                                documentElement.msRequestFullscreen();
+                            }
+                            this.title = 'Exit Fullscreen';
+                            let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
+                            let svgElement = this.childNodes.item(0);
+
+                            svgElement.setAttribute('viewBox', '0 0 950 1024');
+                            svgElement.setAttribute('width', '24px');
+                            svgElement.setAttribute('height', '24px');
+                            pathElement.setAttribute('d', 'M682 342h128v84h-212v-212h84v128zM598 810v-212h212v84h-128v128h-84zM342 342v-128h84v212h-212v-84h128zM214 682v-84h212v212h-84v-128h-128z');
+                        } else {
+                            // close fullscreen
+                            if (document.exitFullscreen) {
+                                document.exitFullscreen();
+                            } else if (document.mozCancelFullScreen) {
+                                document.mozCancelFullScreen();
+                            } else if (document.webkitExitFullscreen) {
+                                document.webkitExitFullscreen();
+                            } else if (document.msExitFullscreen) {
+                                document.msExitFullscreen();
+                            }
+                            this.title = 'Enter Fullscreen';
+                            let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
+                            let svgElement = this.childNodes.item(0);
+
+                            svgElement.setAttribute('viewBox', '0 0 18 18');
+                            svgElement.setAttribute('width', '20px');
+                            svgElement.setAttribute('height', '20px');
+                            pathElement.setAttribute('d', 'M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z');
+                        }
+                    }
+                }, false);
+
+                iconSvg.appendChild(path);
+                iconDiv.appendChild(iconSvg);
+
+                return iconDiv;
+            },
+            playPauseIcon() {
+                let iconDiv = document.createElement('div');
+                iconDiv.classList.add('fslightbox-toolbar-button', 'fslightbox-flex-centered');
+                iconDiv.title = 'Turn on auto scroll';
+
+                let iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                iconSvg.setAttribute('viewBox', '0 0 30 30');
+                iconSvg.setAttribute('width', '16px');
+                iconSvg.setAttribute('height', '16px');
+
+                let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', 'M 6 3 A 1 1 0 0 0 5 4 A 1 1 0 0 0 5 4.0039062 L 5 15 L 5 25.996094 A 1 1 0 0 0 5 26 A 1 1 0 0 0 6 27 A 1 1 0 0 0 6.5800781 26.8125 L 6.5820312 26.814453 L 26.416016 15.908203 A 1 1 0 0 0 27 15 A 1 1 0 0 0 26.388672 14.078125 L 6.5820312 3.1855469 L 6.5800781 3.1855469 A 1 1 0 0 0 6 3 z');
+                path.classList.add('fslightbox-svg-path');
+
+                let g = this.galleryPlaying;
+                iconDiv.addEventListener('click', function(event) {
+                        if (!g) {
+                            this.title = 'Turn off auto scroll';
+                            let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
+                            let svgElement = this.childNodes.item(0);
+
+                            svgElement.setAttribute('viewBox', '0 0 356.19 356.19');
+                            svgElement.setAttribute('width', '14px');
+                            svgElement.setAttribute('height', '14px');
+                            pathElement.setAttribute('d', 'M121,0c18,0,33,15,33,33v372c0,18-15,33-33,33s-32-15-32-33V33C89,15,103,0,121,0zM317,0c18,0,32,15,32,33v372c0,18-14,33-32,33s-33-15-33-33V33C284,15,299,0,317,0z');
+                        } else {
+
+                            this.title = 'Turn on auto scroll';
+                            let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
+                            let svgElement = this.childNodes.item(0);
+
+                            svgElement.setAttribute('viewBox', '0 0 30 30');
+                            svgElement.setAttribute('width', '16px');
+                            svgElement.setAttribute('height', '16px');
+                            pathElement.setAttribute('d', 'M 6 3 A 1 1 0 0 0 5 4 A 1 1 0 0 0 5 4.0039062 L 5 15 L 5 25.996094 A 1 1 0 0 0 5 26 A 1 1 0 0 0 6 27 A 1 1 0 0 0 6.5800781 26.8125 L 6.5820312 26.814453 L 26.416016 15.908203 A 1 1 0 0 0 27 15 A 1 1 0 0 0 26.388672 14.078125 L 6.5820312 3.1855469 L 6.5800781 3.1855469 A 1 1 0 0 0 6 3 z');
+                        }
+                        g = !g;
+                }, false);
+
+                iconSvg.appendChild(path);
+                iconDiv.appendChild(iconSvg);
+
+                return iconDiv;
+            }
+        },
 
         methods: {
             test(evt) {
@@ -125,73 +236,9 @@
             },
             drawToolbar() {
                 this.$nextTick(() => {
-                    // let element = `<div title="Enter fullscreen" class="fslightbox-toolbar-button fslightbox-flex-centered"><svg width="20px" height="20px" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z" class="fslightbox-svg-path"></path></svg></div>`;
                     let toolbar = document.getElementsByClassName('fslightbox-toolbar').item(0);
-                    console.log(toolbar.childNodes)
-                    // toolbar.innerHTML = '';
-                    // fullscreen icon
-                    let iconDiv = document.createElement('div');
-                    iconDiv.classList.add('fslightbox-toolbar-button', 'fslightbox-flex-centered');
-                    iconDiv.title = 'Enter fullscreen';
-
-                    let iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    iconSvg.setAttribute('viewBox', '0 0 18 18');
-                    iconSvg.setAttribute('width', '20px');
-                    iconSvg.setAttribute('height', '20px');
-
-                    let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    path.setAttribute('d', 'M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z');
-                    path.classList.add('fslightbox-svg-path');
-
-                    iconDiv.addEventListener('click', function(event) {
-                        if (document.fullscreenEnabled) {
-                            if (document.fullscreenElement === null) {
-                                // request fullscreen
-                                const documentElement = document.documentElement;
-                                if (documentElement.requestFullscreen) {
-                                    documentElement.requestFullscreen();
-                                } else if (documentElement.mozRequestFullScreen) {
-                                    documentElement.mozRequestFullScreen();
-                                } else if (documentElement.webkitRequestFullscreen) {
-                                    documentElement.webkitRequestFullscreen();
-                                } else if (documentElement.msRequestFullscreen) {
-                                    documentElement.msRequestFullscreen();
-                                }
-                                this.title = 'Exit Fullscreen';
-                                let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
-                                let svgElement = this.childNodes.item(0);
-
-                                svgElement.setAttribute('viewBox', '0 0 950 1024');
-                                svgElement.setAttribute('width', '24px');
-                                svgElement.setAttribute('height', '24px');
-                                pathElement.setAttribute('d', 'M682 342h128v84h-212v-212h84v128zM598 810v-212h212v84h-128v128h-84zM342 342v-128h84v212h-212v-84h128zM214 682v-84h212v212h-84v-128h-128z');
-                            } else {
-                                // close fullscreen
-                                if (document.exitFullscreen) {
-                                    document.exitFullscreen();
-                                } else if (document.mozCancelFullScreen) {
-                                    document.mozCancelFullScreen();
-                                } else if (document.webkitExitFullscreen) {
-                                    document.webkitExitFullscreen();
-                                } else if (document.msExitFullscreen) {
-                                    document.msExitFullscreen();
-                                }
-                                this.title = 'Enter Fullscreen';
-                                let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
-                                let svgElement = this.childNodes.item(0);
-
-                                svgElement.setAttribute('viewBox', '0 0 18 18');
-                                svgElement.setAttribute('width', '20px');
-                                svgElement.setAttribute('height', '20px');
-                                pathElement.setAttribute('d', 'M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z');
-                            }
-                        }
-                    }, false);
-
-                    iconSvg.appendChild(path);
-                    iconDiv.appendChild(iconSvg);
-
-                    toolbar.replaceChild(iconDiv, toolbar.childNodes.item(0));
+                    // toolbar.replaceChild(this.fullscreenIcon, toolbar.childNodes.item(0));
+                    toolbar.insertBefore(this.playPauseIcon, toolbar.firstChild);
                 })
             },
             closeOverlay(evt) {

@@ -30,19 +30,19 @@
     </v-app-bar>
 
     <v-content>
-      <HelloWorld/>
+      <Index/>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/Index'
+import Index from './components/Index'
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld
+    Index
   },
 
   data: () => ({
