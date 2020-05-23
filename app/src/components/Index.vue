@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Searchbar @getSubreddit="getSubreddit"></Searchbar>
+        <Searchbar @get-subreddit="getSubreddit"></Searchbar>
 
         <v-alert v-model="this.alert"
                  icon="mdi-alert-octagon"
@@ -11,12 +11,12 @@
             <v-row align="center">
                 <v-col class="grow"> Your search returned some NSFW (Not Safe For Work) content. Would you like to see this content?</v-col>
                 <v-col class="shrink">
-                    <v-btn icon small ripple type="button" color="black" @click="showContent(false)">
+                    <v-btn icon small ripple type="button" color="black" @click="setNsfwChoice(false)">
                         <v-icon>mdi-cancel</v-icon>
                     </v-btn>
                 </v-col>
                 <v-col class="shrink">
-                    <v-btn icon small ripple type="button" color="black" @click="showContent(true)">
+                    <v-btn icon small ripple type="button" color="black" @click="setNsfwChoice(true)">
                         <v-icon>mdi-check</v-icon>
                     </v-btn>
                 </v-col>
@@ -25,10 +25,10 @@
 
         <Lightbox :posts="this.posts" :index="index"></Lightbox>
 
-        <ImageGallery :posts="this.posts"></ImageGallery>
+        <ImageGallery :posts="this.posts" @update-page="updateContent"></ImageGallery>
 
         <v-snackbar
-            v-model="snackbar" top
+            v-model="error_snackbar" top
             :color="'error'"
             :multi-line="'multi-line'"
             :timeout="6000"
@@ -37,7 +37,55 @@
             <v-btn
                 dark
                 text
-                @click="snackbar = false"
+                @click="error_snackbar = false"
+            >
+                Close
+            </v-btn>
+        </v-snackbar>
+
+        <v-snackbar
+            v-model="info_snackbar" top
+            :color="'info'"
+            :multi-line="'multi-line'"
+            :timeout="6000"
+        >
+            Click on any image to open it in a new tab to view it fully.
+            <v-btn
+                dark
+                text
+                @click="info_snackbar = false"
+            >
+                Got it
+            </v-btn>
+        </v-snackbar>
+
+        <v-snackbar
+            v-model="nsfw_snackbar" top
+            :color="'info'"
+            :multi-line="'multi-line'"
+            :timeout="6000"
+        >
+            Your NSFW choice will be remembered for the duration of the session.
+            <v-btn
+                dark
+                text
+                @click="nsfw_snackbar = false"
+            >
+                Got it
+            </v-btn>
+        </v-snackbar>
+
+        <v-snackbar
+            v-model="error_update_snackbar" top
+            :color="'error'"
+            :multi-line="'multi-line'"
+            :timeout="6000"
+        >
+            This subreddit is either down or does not exist. Please try again.
+            <v-btn
+                dark
+                text
+                @click="error_update_snackbar = false"
             >
                 Close
             </v-btn>
@@ -56,9 +104,12 @@
         name: 'Index',
         components: {ImageGallery, Searchbar, Lightbox},
         data: () => ({
-            snackbar: false,
+            error_snackbar: false,
+            nsfw_snackbar: false,
+            info_snackbar: false,
+            error_update_snackbar: false,
             alert: false,
-            httpResult: null,
+            result: null,
             limit: 20,
             after: '',
             posts: [],
@@ -68,19 +119,31 @@
         }),
 
         methods: {
-            showContent(showNsfw) {
+            setNsfwChoice(val) {
+                sessionStorage.setItem('nsfw_enabled', val.toString());
+                this.showContent();
+            },
+            getNsfwChoice() {
+                return JSON.parse(sessionStorage.getItem('nsfw_enabled'));
+            },
+            showContent() {
                 this.alert = false;
-                if (this.httpResult !== null) {
-                    let newPosts = JSON.parse(JSON.stringify(this.httpResult));
+                if (this.result !== null) {
+                    if (sessionStorage.getItem('info_snackbar_shown') === null) {
+                        this.info_snackbar = true;
+                        sessionStorage.setItem('info_snackbar_shown', 'true');
+                    } // else do not show the snackbar
+
+                    let newPosts = JSON.parse(JSON.stringify(this.result));
                     // remove all textual posts
                     newPosts = newPosts.filter(item => item.post_hint === 'image' && item.is_self === false);
-
+                    // todo: maybe show an snackbar notif if there is no image content?
                     // not sure how best to do this below
                     let nsfwPosts = newPosts.filter(item => item.over_18 === true);
                     let nonNsfwPosts = newPosts.filter(item => item.over_18 !== true);
 
                     let toAdd = [];
-                    if (showNsfw) {
+                    if (this.getNsfwChoice()) {
                         toAdd.push(...nsfwPosts);
                     }
                     toAdd.push(...nonNsfwPosts);
@@ -106,26 +169,37 @@
                 getSubredditWithParams(text, postType, this.limit, '')
                     .then(result => {
                         let nsfwContentReturned = result.find(item => item.over_18 === true) !== undefined;
-                        this.httpResult = result;
-                        if (nsfwContentReturned) {
+                        this.result = result;
+                        if (nsfwContentReturned && !this.getNsfwChoice()) {
                             this.alert = true;
+                        } else {
+                            this.showContent();
                         }
+
                     })
                     .catch(error => {
-                        this.httpResult = null;
-                        this.snackbar = true;
+                        this.result = null;
+                        this.error_snackbar = true;
                     });
             },
             updateContent() {
                 // don't like how this is done
                 getSubredditWithParams(this.textContent, this.postType, this.limit, this.after)
                     .then(result => {
-                        this.httpResult = result;
+                        // this.httpResult = result;
                         // remember if user agreed to nsfw here
-                        this.showContent(true)
+                        let nsfwContentReturned = result.find(item => item.over_18 === true) !== undefined;
+                        this.result = result;
+                        if (nsfwContentReturned && !this.getNsfwChoice()) {
+                            this.alert = true;
+                        } else {
+                            this.showContent();
+                        }
                     })
                     .catch(error => {
                         // silently ignore this one for now
+                        this.error_update_snackbar = true;
+                        this.result = null;
                     })
             },
         }

@@ -53,7 +53,7 @@
                 this.$emit('cleartext');
             },
             getSubreddit(){
-                this.$emit('getSubreddit', this.text, this.postType, false);
+                this.$emit('get-subreddit', this.text, this.postType, true);
             },
         }
     }

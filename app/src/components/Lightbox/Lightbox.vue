@@ -3,7 +3,7 @@
         <v-container>
             <!--        insert play button -->
             <v-btn type="primary" @click="showSlideshow">
-                Play Slideshow
+                Start Slideshow
             </v-btn>
 
         </v-container>
