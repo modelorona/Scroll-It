@@ -28,7 +28,7 @@
             :multi-line="'multi-line'"
             :timeout="6000"
         >
-            Click on any image to open it in a new tab to view it fully.
+            Click on any image to view it by itself.
             <v-btn
                 dark
                 text

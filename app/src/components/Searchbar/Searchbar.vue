@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-form @submit="getSubreddit">
+        <v-form @submit.prevent="getSubreddit">
             <v-row :align-content="'center'" :justify="'center'">
                 <v-col cols="8">
                     <v-text-field outlined :label="this.label" filled v-model="text" dense
@@ -51,9 +51,6 @@
         }),
 
         methods: {
-            clearText() {
-                this.$emit('cleartext');
-            },
             getSubreddit() {
                 this.$emit('get-subreddit', this.text, this.postType, true);
             },
