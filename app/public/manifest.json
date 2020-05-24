@@ -3,7 +3,7 @@
   "short_name": "Scroll-It",
   "theme_color": "#f32121",
   "background_color": "#2187d7",
-  "display": "browser",
+  "display": "minimal-ui",
   "scope": "/",
   "start_url": "/",
   "icons": [
