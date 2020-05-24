@@ -1,3 +1,4 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/24acef48-4ab1-46ca-8bf1-725e347f3248/deploy-status)](https://app.netlify.com/sites/scroll-it/deploys)
 # Scroll-It
 A simple auto scroller for Reddit image threads.
 
