@@ -23,7 +23,7 @@
             </v-row>
         </v-alert>
 
-        <Lightbox :posts="this.posts" :index="index"></Lightbox>
+<!--        <Lightbox :posts="this.posts" :index="index" @update-page="updateContent"></Lightbox>-->
 
         <ImageGallery :posts="this.posts" @update-page="updateContent"></ImageGallery>
 
@@ -96,13 +96,13 @@
 
 <script>
     import Searchbar from "./Searchbar/Searchbar";
-    import Lightbox from "./Lightbox/Lightbox";
+    // import Lightbox from "./Lightbox/Lightbox";
     import ImageGallery from "./ImageGallery/ImageGallery";
     import {getSubredditWithParams} from "../api/reddit";
 
     export default {
         name: 'Index',
-        components: {ImageGallery, Searchbar, Lightbox},
+        components: {ImageGallery, Searchbar},
         data: () => ({
             error_snackbar: false,
             nsfw_snackbar: false,
@@ -110,12 +110,12 @@
             error_update_snackbar: false,
             alert: false,
             result: null,
-            limit: 20,
+            limit: 5,
             after: '',
             posts: [],
             index: 0,
             textContent: '', // for being able to get new content
-            postType: '' // for new content
+            postType: '', // for new content,
         }),
 
         methods: {
@@ -157,6 +157,7 @@
 
                     this.after = `t3_${newPosts[newPosts.length - 1].id}`;
                     this.posts.push(...cleanToAdd);
+                    // this.lastPostUrl = cleanToAdd[cleanToAdd.length-1].src;
                     this.index++;
                 }
             },

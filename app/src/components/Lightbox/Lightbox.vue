@@ -2,17 +2,30 @@
     <div>
         <v-container>
             <!--        insert play button -->
-            <v-btn type="primary" @click="showSlideshow">
+            <v-btn type="primary" @click="$emit('show-slideshow')">
                 Start Slideshow
             </v-btn>
 
         </v-container>
-        <FsLightbox id="lightbox"
+        <FsLightbox id="lightbox" ref="lightbox"
                     :toggler="toggler" type="image"
                     :sources="posts.map(v => v.src)"
                     :key="this.$props.index"
         >
         </FsLightbox>
+
+<!--        <v-overlay dark absolute :value="toggler" :opacity=".90">-->
+<!--            -->
+<!--            -->
+<!--            -->
+<!--            <v-btn-->
+<!--                color="primary"-->
+<!--                @click="toggler = false"-->
+<!--            >-->
+<!--                Hide Overlay-->
+<!--            </v-btn>-->
+<!--        </v-overlay>-->
+
     </div>
 </template>
 
@@ -40,6 +53,7 @@
         data: () => ({
             toggler: false,
             galleryPlaying: false,
+            observer: null
         }),
 
         computed: {
@@ -58,7 +72,7 @@
                 path.classList.add('fslightbox-svg-path');
 
                 let g = this.galleryPlaying;
-                iconDiv.addEventListener('click', function(event) {
+                iconDiv.addEventListener('click', function (event) {
                     if (!g) {
                         this.title = 'Turn off auto scroll';
                         let pathElement = this.getElementsByClassName('fslightbox-svg-path').item(0);
@@ -86,19 +100,58 @@
                 iconDiv.appendChild(iconSvg);
 
                 return iconDiv;
-            }
+            },
         },
+
+        // beforeDestroy() {
+        //     if (this.observer !== null) {
+        //         console.log('removing observer...')
+        //         this.observer.disconnect();
+        //     }
+        // },
 
         methods: {
             drawToolbar() {
                 this.$nextTick(() => {
                     let toolbar = document.getElementsByClassName('fslightbox-toolbar').item(0);
                     toolbar.insertBefore(this.playPauseIcon, toolbar.firstChild);
-                })
+                });
+            },
+            currentElement() {
+                this.$nextTick(() => {
+                    let navbar = document.getElementsByClassName('fslightbox-slide-number-container').item(0);
+                    let spans = navbar.getElementsByTagName("span");
+                    // this.currentNum = Number.parseInt(spans[0].innerHTML);
+                    // this.lastNum = Number.parseInt(spans[2].innerHTML);
+
+                    if (this.observer === null) {
+                        console.log('adding observer...')
+                        let observer = new MutationObserver(() => {
+                            const lastNum = Number.parseInt(document.getElementsByClassName('fslightbox-slide-number-container').item(0)
+                                .getElementsByTagName("span")[2].innerHTML);
+
+                            const currentNum = Number.parseInt(document.getElementsByClassName('fslightbox-slide-number-container').item(0)
+                                .getElementsByTagName("span")[0].innerHTML);
+
+                            console.log(lastNum);
+                            console.log(currentNum);
+
+                            if ((lastNum - currentNum) === 2) {
+                                console.log('here')
+                                this.$emit('update-page');
+                            }
+
+                        });
+
+                        observer.observe(spans[0], {subtree: true, childList: true, characterData: true});
+                        this.observer = observer;
+                    }
+                });
             },
             showSlideshow() {
                 this.toggler = !this.toggler;
-                this.drawToolbar();
+                // this.drawToolbar();
+                // this.currentElement();
             },
         }
     }
