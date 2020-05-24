@@ -2,28 +2,7 @@
     <div>
         <Searchbar @get-subreddit="getSubreddit"></Searchbar>
 
-        <v-alert v-model="this.alert"
-                 icon="mdi-alert-octagon"
-                 prominent border="left"
-                 text dense
-                 type="info"
-        >
-            <v-row align="center">
-                <v-col class="grow"> Your search returned some NSFW (Not Safe For Work) content. Would you like to see this content?</v-col>
-                <v-col class="shrink">
-                    <v-btn icon small ripple type="button" color="black" @click="setNsfwChoice(false)">
-                        <v-icon>mdi-cancel</v-icon>
-                    </v-btn>
-                </v-col>
-                <v-col class="shrink">
-                    <v-btn icon small ripple type="button" color="black" @click="setNsfwChoice(true)">
-                        <v-icon>mdi-check</v-icon>
-                    </v-btn>
-                </v-col>
-            </v-row>
-        </v-alert>
-
-<!--        <Lightbox :posts="this.posts" :index="index" @update-page="updateContent"></Lightbox>-->
+        <NsfwAlert :alert="this.nsfwAlert" @set-nsfw-choice="setNsfwChoice"></NsfwAlert>
 
         <ImageGallery :posts="this.posts" @update-page="updateContent"></ImageGallery>
 
@@ -37,7 +16,7 @@
             <v-btn
                 dark
                 text
-                @click="error_snackbar = false"
+                @click="error_snackbar=false"
             >
                 Close
             </v-btn>
@@ -53,7 +32,7 @@
             <v-btn
                 dark
                 text
-                @click="info_snackbar = false"
+                @click="info_snackbar=false"
             >
                 Got it
             </v-btn>
@@ -69,7 +48,7 @@
             <v-btn
                 dark
                 text
-                @click="nsfw_snackbar = false"
+                @click="nsfw_snackbar=false"
             >
                 Got it
             </v-btn>
@@ -85,7 +64,7 @@
             <v-btn
                 dark
                 text
-                @click="error_update_snackbar = false"
+                @click="error_update_snackbar=false"
             >
                 Close
             </v-btn>
@@ -99,18 +78,19 @@
     // import Lightbox from "./Lightbox/Lightbox";
     import ImageGallery from "./ImageGallery/ImageGallery";
     import {getSubredditWithParams} from "../api/reddit";
+    import NsfwAlert from "./NsfwAlert/NsfwAlert";
 
     export default {
         name: 'Index',
-        components: {ImageGallery, Searchbar},
+        components: {NsfwAlert, ImageGallery, Searchbar},
         data: () => ({
             error_snackbar: false,
             nsfw_snackbar: false,
             info_snackbar: false,
             error_update_snackbar: false,
-            alert: false,
+            nsfwAlert: false,
             result: null,
-            limit: 5,
+            limit: 20,
             after: '',
             posts: [],
             index: 0,
@@ -127,7 +107,7 @@
                 return JSON.parse(sessionStorage.getItem('nsfw_enabled'));
             },
             showContent() {
-                this.alert = false;
+                this.nsfwAlert = false;
                 if (this.result !== null) {
                     if (sessionStorage.getItem('info_snackbar_shown') === null) {
                         this.info_snackbar = true;
@@ -169,14 +149,7 @@
                 }
                 getSubredditWithParams(text, postType, this.limit, '')
                     .then(result => {
-                        let nsfwContentReturned = result.find(item => item.over_18 === true) !== undefined;
-                        this.result = result;
-                        if (nsfwContentReturned && !this.getNsfwChoice()) {
-                            this.alert = true;
-                        } else {
-                            this.showContent();
-                        }
-
+                        this.handleHttpResult(result)
                     })
                     .catch(error => {
                         this.result = null;
@@ -184,18 +157,9 @@
                     });
             },
             updateContent() {
-                // don't like how this is done
                 getSubredditWithParams(this.textContent, this.postType, this.limit, this.after)
                     .then(result => {
-                        // this.httpResult = result;
-                        // remember if user agreed to nsfw here
-                        let nsfwContentReturned = result.find(item => item.over_18 === true) !== undefined;
-                        this.result = result;
-                        if (nsfwContentReturned && !this.getNsfwChoice()) {
-                            this.alert = true;
-                        } else {
-                            this.showContent();
-                        }
+                        this.handleHttpResult(result);
                     })
                     .catch(error => {
                         // silently ignore this one for now
@@ -203,6 +167,15 @@
                         this.result = null;
                     })
             },
+            handleHttpResult(result) {
+                let nsfwContentReturned = result.find(item => item.over_18 === true) !== undefined;
+                this.result = result;
+                if (nsfwContentReturned && !this.getNsfwChoice()) {
+                    this.nsfwAlert = true;
+                } else {
+                    this.showContent();
+                }
+            }
         }
     }
 </script>
