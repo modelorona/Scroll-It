@@ -75,7 +75,6 @@
 
 <script>
     import Searchbar from "./Searchbar/Searchbar";
-    // import Lightbox from "./Lightbox/Lightbox";
     import ImageGallery from "./ImageGallery/ImageGallery";
     import {getSubredditWithParams} from "../api/reddit";
     import NsfwAlert from "./NsfwAlert/NsfwAlert";
@@ -117,7 +116,7 @@
                     let newPosts = JSON.parse(JSON.stringify(this.result));
                     // remove all textual posts
                     newPosts = newPosts.filter(item => item.post_hint === 'image' && item.is_self === false);
-                    // todo: maybe show an snackbar notif if there is no image content?
+
                     // not sure how best to do this below
                     let nsfwPosts = newPosts.filter(item => item.over_18 === true);
                     let nonNsfwPosts = newPosts.filter(item => item.over_18 !== true);
@@ -137,7 +136,6 @@
 
                     this.after = `t3_${newPosts[newPosts.length - 1].id}`;
                     this.posts.push(...cleanToAdd);
-                    // this.lastPostUrl = cleanToAdd[cleanToAdd.length-1].src;
                     this.index++;
                 }
             },

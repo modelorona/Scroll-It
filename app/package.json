@@ -15,6 +15,7 @@
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
     "vue-esc": "^3.0.1",
+    "vue-unique-id": "^3.1.0",
     "vuetify": "^2.2.29"
   },
   "devDependencies": {
