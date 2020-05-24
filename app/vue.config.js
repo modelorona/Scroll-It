@@ -1,4 +1,5 @@
 const CompressionPlugin = require('compression-webpack-plugin');
+const {GenerateSW} = require('workbox-webpack-plugin');
 
 module.exports = {
     pages: {
@@ -15,6 +16,7 @@ module.exports = {
     ],
     configureWebpack: {
         plugins: [
+            new GenerateSW(),
             new CompressionPlugin()
         ]
     }
