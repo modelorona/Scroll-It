@@ -10,7 +10,6 @@ module.exports = {
             title: 'Scroll-It'
         }
     },
-    integrity: true,
     transpileDependencies: [
         'vuetify'
     ],
