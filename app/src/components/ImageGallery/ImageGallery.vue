@@ -111,7 +111,7 @@
                             this.currentImage = this.$props.posts[++currentPos];
                         } // do not go to next if there is nothing to go to
                     }
-                }, 2000);
+                }, 5000);
             },
             updatePage() {
                 this.$emit('update-page');
