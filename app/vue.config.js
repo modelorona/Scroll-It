@@ -10,6 +10,8 @@ module.exports = {
             title: 'Scroll-It'
         }
     },
+    crossorigin: 'anonymous',
+    integrity: true,
     transpileDependencies: [
         'vuetify'
     ],
