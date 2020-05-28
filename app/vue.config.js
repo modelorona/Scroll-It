@@ -1,7 +1,7 @@
 const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
-const {GenerateSW} = require('workbox-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {GenerateSW} = require('workbox-webpack-plugin');
 
 module.exports = {
     pages: {
@@ -18,27 +18,20 @@ module.exports = {
         'vuetify'
     ],
     configureWebpack: {
+        mode: 'production',
         plugins: [
             new CleanWebpackPlugin(),
-            new GenerateSW(),
-            new CompressionPlugin()
+            new CompressionPlugin(),
+            new GenerateSW({
+                mode: 'production',
+                clientsClaim: true,
+                cleanupOutdatedCaches: true,
+                skipWaiting: true
+            })
         ],
         output: {
             filename: '[name].[contenthash].js',
             path: path.resolve(__dirname, 'dist')
-        },
-        optimization: {
-            moduleIds: 'hashed',
-            runtimeChunk: 'single',
-            splitChunks: {
-                cacheGroups: {
-                    vendor: {
-                        test: /[\\/]node_modules[\\/]/,
-                        name: 'vendors',
-                        chunks: 'all'
-                    }
-                }
-            }
         }
     }
 }
