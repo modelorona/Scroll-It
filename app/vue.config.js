@@ -2,7 +2,6 @@ const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
 const {GenerateSW} = require('workbox-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     pages: {
@@ -21,9 +20,6 @@ module.exports = {
     configureWebpack: {
         plugins: [
             new CleanWebpackPlugin(),
-            new HtmlWebPackPlugin({
-                hash: true
-            }),
             new GenerateSW(),
             new CompressionPlugin()
         ],
