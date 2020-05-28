@@ -97,6 +97,24 @@
             postType: '', // for new content,
         }),
 
+        watch: {
+            $route: function (to, from) {
+                if (to.name === 'index') {
+                    this.posts = []; // reset if on home page
+                }
+                if (to.name === 'thread_view') {
+                    this.getSubreddit(to.params.thread, to.query.type, true);
+                }
+            }
+        },
+
+        created() {
+            if (this.$route.params.hasOwnProperty('thread')) {
+                this.getSubreddit(this.$route.params.thread,
+                    this.$route.query.type!==undefined?this.$route.query.type:'Hot', true)
+            }
+        },
+
         methods: {
             setNsfwChoice(val) {
                 sessionStorage.setItem('nsfw_enabled', val.toString());

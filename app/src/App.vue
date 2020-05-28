@@ -2,13 +2,15 @@
     <v-app>
         <Navbar></Navbar>
         <v-content>
-            <Index/>
+            <keep-alive>
+                <router-view></router-view>
+            </keep-alive>
         </v-content>
     </v-app>
 </template>
 
 <script>
-    import Index from './components/Index'
+    // import Index from './components/Index'
     import Navbar from "./components/Navbar/Navbar";
 
     export default {
@@ -16,7 +18,7 @@
 
         components: {
             Navbar,
-            Index
+            // Index
         },
 
         data: () => ({

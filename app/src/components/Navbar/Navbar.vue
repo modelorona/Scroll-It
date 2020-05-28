@@ -94,7 +94,5 @@
 </script>
 
 <style scoped>
-    .nav-bar-image {
-        cursor: pointer;
-    }
+
 </style>

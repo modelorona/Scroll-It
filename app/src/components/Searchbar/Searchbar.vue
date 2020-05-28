@@ -1,11 +1,12 @@
 <template>
     <v-container>
-        <v-form @submit.prevent="getSubreddit">
+        <v-form @submit.prevent="">
             <v-row :align-content="'center'" :justify="'center'">
                 <v-col cols="8">
-                    <v-text-field outlined :label="this.label" filled v-model="text" dense
+                    <v-text-field outlined :label="this.label" filled v-model="text" dense id="search_text_field"
                                   clear-icon="mdi-close-circle" clearable class="ml-1 mr-1"
                                   type="text"  :hint="`${this.label} that you wish to search for.`"
+                                  v-on:keyup.enter="searchOnEnter"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="4">
@@ -28,12 +29,27 @@
                             </v-card-actions>
                         </v-card>
                     </v-menu>
-                    <v-btn icon large ripple type="submit" @click="getSubreddit">
+                    <v-btn icon large ripple type="submit" :to="`/r/${this.text}?type=${this.postType}`" ref="submit_button">
                         <v-icon>mdi-send</v-icon>
                     </v-btn>
                 </v-col>
             </v-row>
         </v-form>
+        <v-snackbar
+            v-model="autofocus" top
+            :color="'info'"
+            :multi-line="'multi-line'"
+            :timeout="2000"
+        >
+            Please enter a thread name to search for.
+            <v-btn
+                dark
+                text
+                @click="autofocus=false"
+            >
+                Got it
+            </v-btn>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -47,13 +63,37 @@
             label: 'Enter subreddit name',
             menu: false,
             postTypeLabel: 'Choose post type',
-            text: ''
+            text: '',
+            autofocus: false
         }),
 
+        created() {
+            if (this.$route.params.hasOwnProperty('thread')) {
+                this.text = this.$route.params.thread;
+                if (this.$route.query.hasOwnProperty('type')) {
+                    let type = this.$route.query.type;
+                    if (this.postTypeOptions.indexOf(type) !== -1) {
+                        this.postType = type;
+                    }
+                }
+            }
+        },
+
+        watch: {
+            $route: function (to, from) {
+                if (to.name === 'index') {
+                    this.text = '';
+                }
+            }
+        },
+
         methods: {
-            getSubreddit() {
-                this.$emit('get-subreddit', this.text, this.postType, true);
-            },
+            searchOnEnter() {
+                // hacky
+                if (this.text.length !== 0) {
+                    this.$refs.submit_button.$el.click();
+                }
+            }
         }
     }
 </script>
