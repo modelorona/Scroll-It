@@ -22,7 +22,7 @@ module.exports = {
         plugins: [
             new CleanWebpackPlugin(),
             new HtmlWebPackPlugin({
-                title: 'Caching'
+                hash: true
             }),
             new GenerateSW(),
             new CompressionPlugin()
