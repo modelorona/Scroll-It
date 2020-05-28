@@ -6,23 +6,26 @@
             dark dense
         >
             <div class="d-flex align-center">
-                <v-img
-                    alt="Scroll-It"
-                    class="shrink mr-2"
-                    contain
-                    src="../../assets/logo-white.png"
-                    transition="scale-transition"
-                    width="40"
-                />
-
-                <v-img
-                    alt="Scroll-It"
-                    class="shrink mt-1"
-                    contain
-                    min-width="100"
-                    src="../../assets/navbar.png"
-                    width="100"
-                />
+                <router-link to="/">
+                    <v-img
+                        alt="Scroll-It"
+                        class="shrink mr-2"
+                        contain
+                        src="../../assets/logo-white.png"
+                        transition="scale-transition"
+                        width="40"
+                    />
+                </router-link>
+                <router-link to="/">
+                    <v-img
+                        alt="Scroll-It"
+                        class="shrink mt-1"
+                        contain
+                        min-width="100"
+                        src="../../assets/navbar.png"
+                        width="100"
+                    />
+                </router-link>
             </div>
 
             <v-spacer></v-spacer>
@@ -91,5 +94,7 @@
 </script>
 
 <style scoped>
-
+    .nav-bar-image {
+        cursor: pointer;
+    }
 </style>
