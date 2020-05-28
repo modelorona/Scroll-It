@@ -1,5 +1,8 @@
+const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
 const {GenerateSW} = require('workbox-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     pages: {
@@ -17,8 +20,29 @@ module.exports = {
     ],
     configureWebpack: {
         plugins: [
+            new CleanWebpackPlugin(),
+            new HtmlWebPackPlugin({
+                title: 'Caching'
+            }),
             new GenerateSW(),
             new CompressionPlugin()
-        ]
+        ],
+        output: {
+            filename: '[name].[contenthash].js',
+            path: path.resolve(__dirname, 'dist')
+        },
+        optimization: {
+            moduleIds: 'hashed',
+            runtimeChunk: 'single',
+            splitChunks: {
+                cacheGroups: {
+                    vendor: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name: 'vendors',
+                        chunks: 'all'
+                    }
+                }
+            }
+        }
     }
 }
