@@ -22,12 +22,13 @@ module.exports = {
         plugins: [
             new CleanWebpackPlugin(),
             new CompressionPlugin(),
-            new GenerateSW({
-                mode: 'production',
-                clientsClaim: true,
-                cleanupOutdatedCaches: true,
-                skipWaiting: true
-            })
+            // new GenerateSW({
+            //     mode: 'production',
+            //     clientsClaim: true,
+            //     cleanupOutdatedCaches: true,
+            //     skipWaiting: true,
+            //     exclude: [/_redirects/, '/_redirects', ]
+            // })
         ],
         output: {
             filename: '[name].[hash].js',
