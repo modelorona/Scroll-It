@@ -50,18 +50,22 @@
                         </v-card-title>
 
                         <v-card-text>
-                            This is a small side project during the Lockdown of 2020. I wanted to take the time to learn more about Vue.js and Vuetify. I was inspired by <a href="http://www.imagoid.com/" target="_blank">Imagoid</a>
+                            This is a small side project made during the Lockdown of 2020. I wanted to take the time to learn more about Vue.js and Vuetify. I was inspired by <a href="http://www.imagoid.com/" target="_blank">Imagoid</a>
                             and so created a very simple auto scroller for Reddit image posts. I hope you enjoy, and if you find any issues you can leave an issue in the source code repository!
                             <v-icon>mdi-emoticon-happy</v-icon>
 
                             <br/><br/>
                             You can find me on <a href="https://www.linkedin.com/in/ahristozov/" target="_blank">LinkedIn</a> for any further questions or inquiries. Stay safe!
+
+                            <br/><br/>
+                            All content belongs to Reddit and the users that uploaded it. I take no responsibility for what is displayed or searched.
                         </v-card-text>
 
                         <v-divider></v-divider>
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
+                            <a href="https://www.iubenda.com/privacy-policy/43611010" class="iubenda-black iubenda-embed" title="Privacy Policy ">Privacy Policy</a>
                             <v-btn
                                 color="primary" link
                                 text target="_blank" href="https://github.com/modelorona/Scroll-It"

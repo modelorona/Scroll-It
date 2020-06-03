@@ -16,6 +16,7 @@
                 </v-col>
             </v-row>
 
+<!--            todo: look into using some other way of doing this, the overlay is not the best way, and keyboard controls are a hassle-->
             <v-overlay v-on:click.native="closeOverlay($event)" v-esc="()=>this.overlay=false"
                        :opacity="opacity"
                        :value="overlay"
@@ -25,23 +26,40 @@
 
                     <v-col class="flex-grow-1">
                         <v-img :src="currentImageSrc" :max-height="getMaxHeight()" :max-width="getMaxWidth()"
-                               height="100vh" width="100vh" contain class="overlay_image" ref="overlay_image"
+                               height="85vh" width="100vh" contain class="overlay_image" ref="overlay_image"
                                :alt="currentImageAlt">
-                            <template v-slot:placeholder>
-                                <v-row
-                                    class="fill-height ma-0"
-                                    align="center"
-                                    justify="center"
-                                >
-                                </v-row>
-                            </template>
                         </v-img>
                     </v-col>
 
                 </v-row>
+                <v-row align="center"
+                       justify="center">
+                    <v-btn-toggle
+                        v-model="selectedBottomBarButton" dense dark tile active-class="primary"
+                        background-color="primary"
+                        @change="handleButtonPress"
+                    >
+                        <v-btn :value="'close'" ripple>
+                            <span>Close</span>
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
 
-                <v-icon icon v-if="slideshowEnabled && showPlayPause" class="float my-float elevation-20" ref="play_pause_button" @click="slideshowEnabled=false">mdi-pause</v-icon>
-                <v-icon icon v-else-if="!slideshowEnabled && showPlayPause" class="float my-float elevation-20" ref="play_pause_button" @click="slideshowEnabled=true">mdi-play</v-icon>
+                        <v-btn v-if="slideshowEnabled && showPlayPause" :value="'disable-slideshow'">
+                            <span>Pause</span>
+                            <v-icon>mdi-pause</v-icon>
+                        </v-btn>
+
+                        <v-btn v-else-if="!slideshowEnabled && showPlayPause" :value="'enable-slideshow'">
+                            <span>Play </span>
+                            <v-icon>mdi-play</v-icon>
+                        </v-btn>
+
+                        <v-btn :value="'open-thread'" ripple :href="currentImagePostUrl" target="_blank" ref="open-thread-btn">
+                            <span>Open</span>
+                            <v-icon>mdi-open-in-new</v-icon>
+                        </v-btn>
+                    </v-btn-toggle>
+                </v-row>
 
             </v-overlay>
         </v-container>
@@ -64,10 +82,12 @@
             opacity: 0.99,
             zIndex: 5,
             overlay: false,
-            currentImage: {src: '', alt: ''},
+            currentImage: {src: '', alt: '', postUrl: ''},
             slideshowEnabled: false,
             intervalId: null,
-            showPlayPause: false
+            selectedBottomBarButton: null,
+            showPlayPause: false,
+            timeOut: 5000,
         }),
 
         watch: {
@@ -87,10 +107,26 @@
             },
             currentImageAlt() {
                 return this.currentImage.alt;
+            },
+            currentImagePostUrl() {
+                return this.currentImage.postUrl;
             }
         },
 
         methods: {
+            handleButtonPress() {
+                if (this.selectedBottomBarButton === 'close') {
+                    this.overlay = false;
+                    this.slideshowEnabled = false;
+                } else if (this.selectedBottomBarButton === 'disable-slideshow') {
+                    this.slideshowEnabled = false;
+                } else if (this.selectedBottomBarButton === 'enable-slideshow') {
+                    this.slideshowEnabled = true;
+                } else if (this.selectedBottomBarButton === 'open-thread') {
+                    this.$refs['open-thread-btn'].$el.classList.remove('v-item--active');
+                }
+                this.selectedBottomBarButton = null;
+            },
             startSlideshow() {
                 // sets the img src to the first one in posts, and starts a timer to automatically switch
                 if (this.$props.posts.length !== 0) {
@@ -111,7 +147,7 @@
                             this.currentImage = this.$props.posts[++currentPos];
                         } // do not go to next if there is nothing to go to
                     }
-                }, 5000);
+                }, this.timeOut);
             },
             updatePage() {
                 this.$emit('update-page');
@@ -152,21 +188,6 @@
     }
 </script>
 
-<style scoped>
+<style>
 
-    .float {
-        position: fixed;
-        width: 60px;
-        height: 60px;
-        bottom: 20px;
-        right: 20px;
-        background-color: lightseagreen;
-        color: #FFF;
-        border-radius: 50px;
-        text-align: center;
-    }
-
-    .my-float {
-        margin-top: 22px;
-    }
 </style>

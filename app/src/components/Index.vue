@@ -7,23 +7,23 @@
         <ImageGallery :posts="this.posts" @update-page="updateContent"></ImageGallery>
 
         <v-snackbar
-            v-model="error_snackbar" top
+            v-model="errorSnackbar" top
             :color="'error'"
             :multi-line="'multi-line'"
             :timeout="6000"
         >
-            This subreddit is either down or does not exist. Please try again.
+            This subreddit is down, does not exist, or an error occured when trying to fetch the images. Please try again or search for another one.
             <v-btn
                 dark
                 text
-                @click="error_snackbar=false"
+                @click="errorSnackbar=false"
             >
                 Close
             </v-btn>
         </v-snackbar>
 
         <v-snackbar
-            v-model="info_snackbar" top
+            v-model="infoSnackbar" top
             :color="'info'"
             :multi-line="'multi-line'"
             :timeout="6000"
@@ -32,14 +32,14 @@
             <v-btn
                 dark
                 text
-                @click="info_snackbar=false"
+                @click="infoSnackbar=false"
             >
                 Got it
             </v-btn>
         </v-snackbar>
 
         <v-snackbar
-            v-model="nsfw_snackbar" top
+            v-model="nsfwSnackbar" top
             :color="'info'"
             :multi-line="'multi-line'"
             :timeout="6000"
@@ -48,25 +48,9 @@
             <v-btn
                 dark
                 text
-                @click="nsfw_snackbar=false"
+                @click="nsfwSnackbar=false"
             >
                 Got it
-            </v-btn>
-        </v-snackbar>
-
-        <v-snackbar
-            v-model="error_update_snackbar" top
-            :color="'error'"
-            :multi-line="'multi-line'"
-            :timeout="6000"
-        >
-            This subreddit is either down or does not exist. Please try again.
-            <v-btn
-                dark
-                text
-                @click="error_update_snackbar=false"
-            >
-                Close
             </v-btn>
         </v-snackbar>
 
@@ -83,10 +67,9 @@
         name: 'Index',
         components: {NsfwAlert, ImageGallery, Searchbar},
         data: () => ({
-            error_snackbar: false,
-            nsfw_snackbar: false,
-            info_snackbar: false,
-            error_update_snackbar: false,
+            errorSnackbar: false,
+            nsfwSnackbar: false,
+            infoSnackbar: false,
             nsfwAlert: false,
             result: null,
             limit: 20,
@@ -127,7 +110,7 @@
                 this.nsfwAlert = false;
                 if (this.result !== null) {
                     if (sessionStorage.getItem('info_snackbar_shown') === null) {
-                        this.info_snackbar = true;
+                        this.infoSnackbar = true;
                         sessionStorage.setItem('info_snackbar_shown', 'true');
                     } // else do not show the snackbar
 
@@ -150,6 +133,7 @@
                         title: item.title,
                         alt: `Reddit post with title: ${item.title}`,
                         src: item.url,
+                        postUrl: `https://reddit.com${item.permalink}`
                     }));
 
                     this.after = `t3_${newPosts[newPosts.length - 1].id}`;
@@ -169,7 +153,7 @@
                     })
                     .catch(error => {
                         this.result = null;
-                        this.error_snackbar = true;
+                        this.errorSnackbar = true;
                     });
             },
             updateContent() {
@@ -179,7 +163,7 @@
                     })
                     .catch(error => {
                         // silently ignore this one for now
-                        this.error_update_snackbar = true;
+                        this.errorSnackbar = true;
                         this.result = null;
                     })
             },
