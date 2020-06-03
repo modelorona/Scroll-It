@@ -17,7 +17,7 @@
             </v-row>
 
 <!--            todo: look into using some other way of doing this, the overlay is not the best way, and keyboard controls are a hassle-->
-            <v-overlay v-on:click.native="closeOverlay($event)" v-esc="()=>this.overlay=false"
+            <v-overlay v-esc="()=>this.overlay=false"
                        :opacity="opacity"
                        :value="overlay"
                        :z-index="zIndex">
@@ -166,13 +166,13 @@
                 this.currentImage = post;
                 this.overlay = true;
             },
-            closeOverlay(evt) {
-                // maybe hacky way to do this
-                const classname = evt.path[0].className;
-                if (classname === 'v-overlay__scrim') {
-                    this.overlay = false;
-                }
-            },
+            // closeOverlay(evt) {
+            //     // maybe hacky way to do this
+            //     const classname = evt.path[0].className;
+            //     if (classname === 'v-overlay__scrim') {
+            //         this.overlay = false;
+            //     }
+            // },
             getMaxHeight() {
                 return window.innerHeight;
             },
