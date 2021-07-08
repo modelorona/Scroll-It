@@ -61,11 +61,19 @@
                             All content belongs to Reddit and the users that uploaded it. I take no responsibility for what is displayed or searched.
                         </v-card-text>
 
+
+                        <v-divider></v-divider>
+                        <br/>
+                        <v-card-text>
+                            Privacy policy: This site collects no analytics or any other identifiable data.
+                            <br/>
+                            Cookie policy: This site sets no cookies.
+                        </v-card-text>
+
                         <v-divider></v-divider>
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <a href="https://www.iubenda.com/privacy-policy/43611010" class="iubenda-black iubenda-embed" title="Privacy Policy ">Privacy Policy</a>
                             <v-btn
                                 color="primary" link
                                 text target="_blank" href="https://github.com/modelorona/Scroll-It"

@@ -12,7 +12,10 @@
             :multi-line="'multi-line'"
             :timeout="6000"
         >
-            This subreddit is down, does not exist, or an error occured when trying to fetch the images. Please try again or search for another one.
+            This subreddit is down, does not exist, or an error occured when trying to fetch the images.
+            Additionally, your browser might be blocking requests or external resources.
+            Please try again or search for another one.
+            <br/><br/>
             <v-btn
                 dark
                 text
