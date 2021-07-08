@@ -1,7 +1,6 @@
 const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const {GenerateSW} = require('workbox-webpack-plugin');
 
 module.exports = {
     pages: {
@@ -17,18 +16,23 @@ module.exports = {
     transpileDependencies: [
         'vuetify'
     ],
+    css:{
+        requireModuleExtension: true,
+        loaderOptions: {
+            css: {
+                modules: {
+                    localIdentName: '[name]-[hash]'
+                },
+                localsConvention: 'camelCaseOnly'
+            }
+        }
+    },
     configureWebpack: {
         mode: 'production',
         plugins: [
             new CleanWebpackPlugin(),
             new CompressionPlugin(),
-            // new GenerateSW({
-            //     mode: 'production',
-            //     clientsClaim: true,
-            //     cleanupOutdatedCaches: true,
-            //     skipWaiting: true,
-            //     exclude: [/_redirects/, '/_redirects', ]
-            // })
+
         ],
         output: {
             filename: '[name].[hash].js',
