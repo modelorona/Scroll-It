@@ -32,7 +32,6 @@ module.exports = {
         plugins: [
             new CleanWebpackPlugin(),
             new CompressionPlugin(),
-
         ],
         output: {
             filename: '[name].[hash].js',
