@@ -1,116 +1,43 @@
 <template>
   <v-container align-content="start" fluid>
-    <v-row>
-      <v-col cols="12" md="12">
-        <v-text-field
-          v-model="subreddit"
-          clearable
-          hint="Press enter to search"
-          label="Enter Subreddit Name"
-          @keyup.enter="fetchRedditImages(true)"
-        >
-          <template #append-inner>
-            <v-btn icon title="Reset" @click="resetSearch">
-              <v-icon>mdi-restore</v-icon>
-            </v-btn>
-            <v-menu>
-              <template #activator="{ props }">
-                <v-btn v-bind="props" icon title="Sort By">
-                  <v-icon>mdi-wrench</v-icon>
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item
-                  v-for="item in sortOptions"
-                  :key="item"
-                  :value="item"
-                  @click="sortOption = item"
-                >
-                  <v-list-item-title>
-                    {{ item }}
-                    <v-icon v-if="item === sortOption">mdi-check</v-icon>
-                  </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-            <v-btn color="secondary" icon title="Search" @click="fetchRedditImages(true)">
-              <v-icon>mdi-send</v-icon>
-            </v-btn>
-          </template>
-        </v-text-field>
-      </v-col>
-    </v-row>
 
-    <v-row cols="3">
-      <v-alert
-        v-model="isNSFWDialogOpen"
-        dense
-        icon="mdi-alert-octagon"
-        prominent
-        text
-        type="warning"
-      >
-        <v-row align="center">
-          <v-col class="grow">Your search returned some NSFW (Not Safe For Work) content. Would you like to see this content?</v-col>
-        </v-row>
-        <template #append>
-          <v-btn icon small @click="closeNSFWDialog">
-            <v-icon>mdi-cancel</v-icon>
-          </v-btn>
-          <v-btn icon small @click="acceptNSFW">
-            <v-icon>mdi-check</v-icon>
-          </v-btn>
-        </template>
-      </v-alert>
-    </v-row>
+    <SearchBar
+      v-model:sortOption="sortOption"
+      v-model:subreddit="subreddit"
+      @reset="resetSearch"
+      @search="fetchRedditImages(true)"
+    />
 
-    <v-container v-if="posts.length > 0" fluid>
+    <NSFWAlert
+      v-model:isOpen="isNSFWDialogOpen"
+      @accept="acceptNSFW"
+      @decline="declineNSFW"
+    />
+
+    <v-container v-if="posts.length > 0 && !isNSFWDialogOpen" fluid>
       <v-row align="center" justify="center">
         <v-btn @click="startSlideshow(0)">Start slideshow</v-btn>
       </v-row>
     </v-container>
 
-    <v-container fluid>
-      <v-row>
-        <v-col v-for="(post, index) in visiblePosts" :key="post.data.id" cols="12" md="4">
-          <v-card>
-            <v-img :aspect-ratio="1" :src="post.data.url" @click="setOverlayImage(index)" />
-            <v-card-title>{{ post.data.title }}</v-card-title>
-            <v-card-actions>
-              <v-btn color="primary" :href="post.data.url" target="_blank" text>View Image On Reddit</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+    <ImageGrid
+      :agreed-to-n-s-f-w="agreedToNSFW"
+      :posts="posts"
+      @select-image="setOverlayImage"
+    />
 
-    <v-dialog v-model="imageOverlay" max-height="100vh" max-width="100vw" @keydown.esc="stopSlideshow">
-      <v-card class="full-size-card">
-        <v-card-text class="full-size-card-text">
-          <v-progress-circular
-            v-if="imageLoading"
-            class="loader"
-            color="primary"
-            indeterminate
-            size="64"
-          />
-          <v-img
-            :key="currentPostUrl"
-            class="full-size-image"
-            :src="currentPostUrl"
-            @load="imageLoading = false"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" @click="goToLink">View post on Reddit</v-btn>
-          <v-btn :disabled="!hasPrevious" @click="prevImage">Previous</v-btn>
-          <v-btn :disabled="!hasNext" @click="nextImage">Next</v-btn>
-          <v-btn @click="toggleSlideshow">{{ isPlaying ? 'Pause Slideshow' : 'Start Slideshow' }}</v-btn>
-          <v-spacer />
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <ImageOverlay
+      v-model:imageOverlay="imageOverlay"
+      :current-post-url="currentPostUrl"
+      :has-next="hasNext"
+      :has-previous="hasPrevious"
+      :is-playing="isPlaying"
+      @go-to-link="goToLink"
+      @next-image="nextImage"
+      @prev-image="prevImage"
+      @stop-slideshow="stopSlideshow"
+      @toggle-slideshow="toggleSlideshow"
+    />
 
     <div ref="bottomRef" />
   </v-container>
@@ -131,10 +58,8 @@
   const after = ref(null)
   const bottomRef = ref(null)
   const imageOverlay = ref(false)
-  const imageLoading = ref(true)
 
-  const sortOptions = ['hot', 'new', 'top']
-
+  const slideshowIntervalTime = 5000 // 5 seconds per image
   let slideshowInterval = null
 
   const fetchRedditImages = async (reset = false) => {
@@ -167,12 +92,11 @@
     if (isPlaying.value) return
     isPlaying.value = true
     setOverlayImage(startingIndex)
-    slideshowInterval = setInterval(nextImage, 4000)
+    slideshowInterval = setInterval(nextImage, slideshowIntervalTime)
   }
 
   const setOverlayImage = index => {
     imageOverlay.value = true
-    imageLoading.value = true
     currentIndex.value = index
   }
 
@@ -212,7 +136,7 @@
     agreedToNSFW.value = true
   }
 
-  const closeNSFWDialog = () => {
+  const declineNSFW = () => {
     sessionStorage.setItem('agreedToNSFW', 'false')
     agreedToNSFW.value = false
     isNSFWDialogOpen.value = false
@@ -225,8 +149,6 @@
   const visiblePosts = computed(() => {
     return agreedToNSFW.value ? posts.value : posts.value.filter(post => !post.data.over_18)
   })
-
-  // onMounted(() => fetchRedditImages(true))
 
   watch(bottomRef, newVal => {
     if (newVal) {
