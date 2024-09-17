@@ -1,41 +1,39 @@
 <template>
-  <v-container class="full-size-card" fluid>
-    <v-dialog
-      v-model="imageOverlay"
-      max-height="100vh"
-      max-width="100vw"
-      @after-leave="close"
-      @keydown.esc="close"
-    >
-      <v-card class="full-size-card">
-        <v-card-text class="full-size-card-text">
-          <v-progress-circular
-            v-if="imageLoading"
-            class="loader"
-            color="primary"
-            indeterminate
-            size="64"
-          />
-          <v-img
-            :key="currentPostUrl"
-            class="full-size-image"
-            :src="currentPostUrl"
-            @load="imageLoading = false"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-row align="center" class="flex-wrap" justify="center">
-            <v-btn color="primary" @click="$emit('goToLink')"><v-icon>mdi-open-in-new</v-icon> Reddit</v-btn>
-            <v-btn :disabled="!hasPrevious" @click="$emit('prevImage')"><v-icon>mdi-arrow-left</v-icon>Previous</v-btn>
-            <v-btn :disabled="!hasNext" @click="$emit('nextImage')">Next<v-icon>mdi-arrow-right</v-icon></v-btn>
-            <v-btn @click="$emit('toggleSlideshow')">
-              {{ isPlaying ? 'Pause Slideshow' : 'Start Slideshow' }} <v-icon v-if="isPlaying">mdi-pause</v-icon> <v-icon v-else>mdi-play</v-icon>
-            </v-btn>
-          </v-row>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+  <v-dialog
+    v-model="imageOverlay"
+    max-height="100vh"
+    max-width="100vw"
+    @after-leave="close"
+    @keydown.esc="close"
+  >
+    <v-card class="full-size-card">
+      <v-card-text class="full-size-card-text">
+        <v-progress-circular
+          v-if="imageLoading"
+          class="loader"
+          color="primary"
+          indeterminate
+          size="64"
+        />
+        <v-img
+          :key="currentPostUrl"
+          class="full-size-image"
+          :src="currentPostUrl"
+          @load="imageLoading = false"
+        />
+      </v-card-text>
+      <v-card-actions>
+        <v-row align="center" class="flex-wrap" justify="center">
+          <v-btn color="primary" @click="$emit('goToLink')"><v-icon>mdi-open-in-new</v-icon> Reddit</v-btn>
+          <v-btn :disabled="!hasPrevious" @click="$emit('prevImage')"><v-icon>mdi-arrow-left</v-icon>Previous</v-btn>
+          <v-btn :disabled="!hasNext" @click="$emit('nextImage')">Next<v-icon>mdi-arrow-right</v-icon></v-btn>
+          <v-btn @click="$emit('toggleSlideshow')">
+            {{ isPlaying ? 'Pause Slideshow' : 'Start Slideshow' }} <v-icon v-if="isPlaying">mdi-pause</v-icon> <v-icon v-else>mdi-play</v-icon>
+          </v-btn>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
   <script setup>
