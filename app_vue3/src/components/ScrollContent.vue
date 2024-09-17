@@ -186,7 +186,7 @@
   })
 
   watch(currentIndex, newValue => {
-    if (newValue >= visiblePosts.value.length - 4) {
+    if (newValue >= visiblePosts.value.length - 6) {
       fetchRedditImages()
     }
   })
