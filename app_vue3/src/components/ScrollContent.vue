@@ -99,7 +99,8 @@
       posts.value = reset ? filteredPosts : [...posts.value, ...filteredPosts]
       after.value = data.data.after
 
-      if (agreedToNSFW.value !== 'true' && posts.value.some(post => post.data.over_18)) {
+      if (!agreedToNSFW.value && posts.value.some(post => post.data.over_18)) {
+        console.log(typeof agreedToNSFW.value)
         isNSFWDialogOpen.value = true
       }
       fetchingImages.value = false
