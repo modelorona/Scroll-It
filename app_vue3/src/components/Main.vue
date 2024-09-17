@@ -3,26 +3,25 @@
     <v-app-bar :elevation="10">
       <v-app-bar-title>
         <div class="d-flex align-center">
-          <router-link to="/">
-            <v-img
-              alt="Scroll-It"
-              class="shrink mr-2"
-              contain
-              src="@/assets/logo-white.png"
-              transition="scale-transition"
-              width="40"
-            />
-          </router-link>
-          <router-link to="/">
-            <v-img
-              alt="Scroll-It"
-              class="shrink mt-1"
-              contain
-              min-width="100"
-              src="@/assets/navbar.png"
-              width="100"
-            />
-          </router-link>
+          <!-- <router-link to="/"> -->
+          <v-img
+            alt="Scroll-It"
+            class="shrink mr-2"
+            contain
+            max-width="50"
+            src="@/assets/logo-white.png"
+            transition="scale-transition"
+          />
+          <!-- </router-link> -->
+          <!-- <router-link to="/"> -->
+          <v-img
+            alt="Scroll-It"
+            class="shrink mt-1"
+            contain
+            max-width="100"
+            src="@/assets/navbar.png"
+          />
+          <!-- </router-link> -->
         </div>
       </v-app-bar-title>
 

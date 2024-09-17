@@ -11,7 +11,16 @@ import { routes } from 'vue-router/auto-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts(routes),
+  routes: [
+    ...setupLayouts(routes),
+    // {
+    //   path: '/r/:subreddit/',
+    //   component: () => import('@/pages/index.vue'),
+    //   props: route => ({
+    //     sortOption: route.query.type || 'hot',
+    //   }),
+    // },
+  ],
 })
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
