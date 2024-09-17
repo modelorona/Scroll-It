@@ -14,7 +14,23 @@
       @decline="declineNSFW"
     />
 
-    <v-container v-if="posts.length > 0 && !isNSFWDialogOpen" fluid>
+    <v-container v-if="infoBannerVisible && visiblePosts.length > 0 && !isNSFWDialogOpen" fluid>
+      <v-row align="center" justify="center">
+        <v-banner
+          icon="mdi-information"
+          lines="one"
+          rounded
+          :stacked="false"
+          text="Click on an image to enlarge it"
+        >
+          <template #actions>
+            <v-btn icon="mdi-close" @click="infoBannerVisible = false" />
+          </template>
+        </v-banner>
+      </v-row>
+    </v-container>
+
+    <v-container v-if="visiblePosts.length > 0 && !isNSFWDialogOpen" fluid>
       <v-row align="center" justify="center">
         <v-btn @click="startSlideshow(0)">Start slideshow</v-btn>
       </v-row>
@@ -22,7 +38,8 @@
 
     <ImageGrid
       :agreed-to-n-s-f-w="agreedToNSFW"
-      :posts="posts"
+      :fetching-images="fetchingImages"
+      :posts="visiblePosts"
       @select-image="setOverlayImage"
     />
 
@@ -58,6 +75,8 @@
   const after = ref(null)
   const bottomRef = ref(null)
   const imageOverlay = ref(false)
+  const fetchingImages = ref(false)
+  const infoBannerVisible = ref(true)
 
   const slideshowIntervalTime = 5000 // 5 seconds per image
   let slideshowInterval = null
@@ -70,7 +89,7 @@
       after.value = null
       currentIndex.value = 0
     }
-
+    fetchingImages.value = true
     try {
       const url = `https://www.reddit.com/r/${subreddit.value}/${sortOption.value}.json?limit=50${after.value ? `&after=${after.value}` : ''}`
       const response = await fetch(url)
@@ -83,6 +102,7 @@
       if (agreedToNSFW.value !== 'true' && posts.value.some(post => post.data.over_18)) {
         isNSFWDialogOpen.value = true
       }
+      fetchingImages.value = false
     } catch (error) {
       console.error('Error fetching data from Reddit:', error)
     }

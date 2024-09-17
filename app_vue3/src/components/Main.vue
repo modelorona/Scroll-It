@@ -3,7 +3,8 @@
     <v-app-bar :elevation="10">
       <v-app-bar-title>
         <div class="d-flex align-center">
-          <!-- <router-link to="/"> -->
+          <!-- todo: use router-link in the future -->
+          <!-- <router-link to="/">  -->
           <v-img
             alt="Scroll-It"
             class="shrink mr-2"

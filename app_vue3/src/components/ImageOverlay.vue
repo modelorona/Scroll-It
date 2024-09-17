@@ -15,6 +15,7 @@
           indeterminate
           size="64"
         />
+        <v-icon color="white" title="Close" @click="close">mdi-close</v-icon>
         <v-img
           :key="currentPostUrl"
           class="full-size-image"
