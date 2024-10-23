@@ -29,7 +29,7 @@
     "eslint-plugin-vue": "^9.29.1",
     "pinia": "^2.2.4",
     "sass": "1.79.4",
-    "typescript": "^5.5.4",
+    "typescript": "^5.6.3",
     "unplugin-auto-import": "^0.18.3",
     "unplugin-fonts": "^1.1.1",
     "unplugin-vue-components": "^0.27.4",
