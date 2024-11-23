@@ -24,11 +24,14 @@
         />
       </v-card-text>
       <v-card-actions>
+        <div v-if="showTooltip" class="tooltip">
+          Use <kbd>←</kbd>, <kbd>→</kbd> to navigate, <kbd>Space</kbd> to toggle slideshow, and <kbd>Esc</kbd> to close
+        </div>
         <v-row align="center" class="flex-wrap" justify="center">
           <v-btn color="primary" @click="$emit('goToLink')"><v-icon>mdi-open-in-new</v-icon> Reddit</v-btn>
-          <v-btn :disabled="!hasPrevious" @click="$emit('prevImage')"><v-icon>mdi-arrow-left</v-icon>Previous</v-btn>
-          <v-btn :disabled="!hasNext" @click="$emit('nextImage')">Next<v-icon>mdi-arrow-right</v-icon></v-btn>
-          <v-btn @click="$emit('toggleSlideshow')">
+          <v-btn :disabled="!hasPrevious" @click="$emit('prevImage')" @keydown.left.prevent="$emit('prevImage')"><v-icon>mdi-arrow-left</v-icon>Previous</v-btn>
+          <v-btn :disabled="!hasNext" @click="$emit('nextImage')" @keydown.right.prevent="$emit('nextImage')">Next<v-icon>mdi-arrow-right</v-icon></v-btn>
+          <v-btn @click="$emit('toggleSlideshow')" @keydown.space.prevent="$emit('toggleSlideshow')">
             {{ isPlaying ? 'Pause Slideshow' : 'Start Slideshow' }} <v-icon v-if="isPlaying">mdi-pause</v-icon> <v-icon v-else>mdi-play</v-icon>
           </v-btn>
         </v-row>
@@ -52,9 +55,11 @@
 
   const imageOverlay = ref(props.imageOverlay)
   const imageLoading = ref(true)
+  const showTooltip = ref(false)
 
   watch(() => props.imageOverlay, newValue => {
     imageOverlay.value = newValue
+    if (newValue) showShortcutTooltip()
   })
 
   watch(imageOverlay, newValue => {
@@ -65,6 +70,51 @@
     emit('stopSlideshow')
     imageOverlay.value = false
   }
+
+  // Function to show the tooltip
+  const showShortcutTooltip = () => {
+    showTooltip.value = true
+    console.log("here")
+    setTimeout(() => {
+      showTooltip.value = false // Auto-hide after 3 seconds
+    }, 5000)
+  }
+
+  // Global keydown handler
+  const handleKeydown = (event) => {
+    if (!imageOverlay.value) return // Only handle keys if the dialog is open
+
+    switch (event.key) {
+      case 'ArrowLeft':
+        if (props.hasPrevious) {
+          event.preventDefault()
+          emit('prevImage')
+        }
+        break
+      case 'ArrowRight':
+        if (props.hasNext) {
+          event.preventDefault()
+          emit('nextImage')
+        }
+        break
+      case ' ':
+        event.preventDefault() // Prevent space from scrolling the page
+        emit('toggleSlideshow')
+        break
+      case 'Escape':
+        close()
+        break
+    }
+  }
+
+  // Attach and detach global keydown listeners
+  onMounted(() => {
+    window.addEventListener('keydown', handleKeydown)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown)
+  })
   </script>
 
 <style scoped>
@@ -101,6 +151,50 @@
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+  }
+}
+.v-card-actions {
+  position: relative;
+}
+.tooltip {
+  position: absolute;
+  top: -40px;
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  z-index: 10;
+  right: 38%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -8px; /* Adjust to align the arrow */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+kbd {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 2px 4px;
+  font-size: 12px;
+  border-radius: 3px;
+  font-family: 'Courier New', Courier, monospace;
+  color: #333;
+}
+/* Hide tooltip on small screens */
+@media (max-width: 768px) {
+  .tooltip {
+    display: none;
   }
 }
 </style>
