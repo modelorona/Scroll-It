@@ -21,8 +21,8 @@ importers:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.6.3)
       vuetify:
-        specifier: ^3.7.3
-        version: 3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
+        specifier: ^3.7.4
+        version: 3.7.4(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
     devDependencies:
       '@babel/types':
         specifier: ^7.26.0
@@ -44,7 +44,7 @@ importers:
         version: 17.1.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint-plugin-n@16.6.2(eslint@8.57.1))(eslint-plugin-promise@6.6.0(eslint@8.57.1))(eslint@8.57.1)
       eslint-config-vuetify:
         specifier: ^1.0.0
-        version: 1.0.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-n@16.6.2(eslint@8.57.1))(eslint@8.57.1)(typescript@5.6.3)(vite-plugin-vuetify@2.0.4(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.3))
+        version: 1.0.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-n@16.6.2(eslint@8.57.1))(eslint@8.57.1)(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)
       eslint-plugin-import:
         specifier: ^2.31.0
         version: 2.31.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)
@@ -89,7 +89,7 @@ importers:
         version: 0.11.0(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue-router@4.4.5(vue@3.5.13(typescript@5.6.3)))(vue@3.5.13(typescript@5.6.3))
       vite-plugin-vuetify:
         specifier: ^2.0.4
-        version: 2.0.4(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.3)
+        version: 2.0.4(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.4)
       vue-router:
         specifier: ^4.4.5
         version: 4.4.5(vue@3.5.13(typescript@5.6.3))
@@ -1972,8 +1972,8 @@ packages:
       typescript:
         optional: true
 
-  vuetify@3.7.3:
-    resolution: {integrity: sha512-bpuvBpZl1/+nLlXDgdVXekvMNR6W/ciaoa8CYlpeAzAARbY8zUFSoBq05JlLhkIHI58AnzKVy4c09d0OtfYAPg==}
+  vuetify@3.7.4:
+    resolution: {integrity: sha512-Y8UU5wUDQXC3oz2uumPb8IOdvB4XMCxtxnmqdOc+LihNuPlkSgxIwf92ndRzbOtJFKHsggFUxpyLqpQp+A+5kg==}
     engines: {node: ^12.20 || >=14.13}
     peerDependencies:
       typescript: '>=4.7'
@@ -2582,11 +2582,11 @@ snapshots:
 
   '@vue/shared@3.5.13': {}
 
-  '@vuetify/loader-shared@2.0.3(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3)))':
+  '@vuetify/loader-shared@2.0.3(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.4)':
     dependencies:
       upath: 2.0.1
       vue: 3.5.13(typescript@5.6.3)
-      vuetify: 3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
+      vuetify: 3.7.4(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
 
   acorn-jsx@5.3.2(acorn@8.12.1):
     dependencies:
@@ -2968,7 +2968,7 @@ snapshots:
       eslint-plugin-n: 16.6.2(eslint@8.57.1)
       eslint-plugin-promise: 6.6.0(eslint@8.57.1)
 
-  eslint-config-vuetify@1.0.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-n@16.6.2(eslint@8.57.1))(eslint@8.57.1)(typescript@5.6.3)(vite-plugin-vuetify@2.0.4(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.3)):
+  eslint-config-vuetify@1.0.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-n@16.6.2(eslint@8.57.1))(eslint@8.57.1)(typescript@5.6.3)(vite-plugin-vuetify@2.0.4):
     dependencies:
       babel-eslint: 10.1.0(eslint@8.57.1)
       eslint: 8.57.1
@@ -2979,9 +2979,9 @@ snapshots:
       eslint-plugin-promise: 6.6.0(eslint@8.57.1)
       eslint-plugin-standard: 4.1.0(eslint@8.57.1)
       eslint-plugin-vue: 9.31.0(eslint@8.57.1)
-      eslint-plugin-vuetify: 2.4.0(eslint@8.57.1)(vuetify@3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3)))
+      eslint-plugin-vuetify: 2.4.0(eslint@8.57.1)(vuetify@3.7.4)
       vue: 3.5.13(typescript@5.6.3)
-      vuetify: 3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
+      vuetify: 3.7.4(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-typescript
@@ -3098,12 +3098,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-vuetify@2.4.0(eslint@8.57.1)(vuetify@3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))):
+  eslint-plugin-vuetify@2.4.0(eslint@8.57.1)(vuetify@3.7.4):
     dependencies:
       eslint: 8.57.1
       eslint-plugin-vue: 9.31.0(eslint@8.57.1)
       requireindex: 1.2.0
-      vuetify: 3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
+      vuetify: 3.7.4(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
     transitivePeerDependencies:
       - supports-color
 
@@ -4010,14 +4010,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vuetify@2.0.4(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.3):
+  vite-plugin-vuetify@2.0.4(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.4):
     dependencies:
-      '@vuetify/loader-shared': 2.0.3(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3)))
+      '@vuetify/loader-shared': 2.0.3(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.4)
       debug: 4.3.6
       upath: 2.0.1
       vite: 5.4.6(@types/node@22.9.3)(sass@1.81.0)
       vue: 3.5.13(typescript@5.6.3)
-      vuetify: 3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
+      vuetify: 3.7.4(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3))
     transitivePeerDependencies:
       - supports-color
 
@@ -4072,12 +4072,12 @@ snapshots:
     optionalDependencies:
       typescript: 5.6.3
 
-  vuetify@3.7.3(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3)):
+  vuetify@3.7.4(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.6.3)):
     dependencies:
       vue: 3.5.13(typescript@5.6.3)
     optionalDependencies:
       typescript: 5.6.3
-      vite-plugin-vuetify: 2.0.4(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.3)
+      vite-plugin-vuetify: 2.0.4(vite@5.4.6(@types/node@22.9.3)(sass@1.81.0))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.4)
 
   webpack-sources@3.2.3: {}
 
