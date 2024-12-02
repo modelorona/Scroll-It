@@ -73,8 +73,8 @@ importers:
         specifier: ^0.18.6
         version: 0.18.6(rollup@4.28.0)
       unplugin-fonts:
-        specifier: ^1.1.1
-        version: 1.1.1(vite@5.4.11(@types/node@22.10.1)(sass@1.81.0))
+        specifier: ^1.3.1
+        version: 1.3.1(vite@5.4.11(@types/node@22.10.1)(sass@1.81.0))
       unplugin-vue-components:
         specifier: ^0.27.5
         version: 0.27.5(@babel/parser@7.26.2)(rollup@4.28.0)(vue@3.5.13(typescript@5.6.3))
@@ -1803,11 +1803,11 @@ packages:
       '@vueuse/core':
         optional: true
 
-  unplugin-fonts@1.1.1:
-    resolution: {integrity: sha512-/Aw/rL9D2aslGGM0vi+2R2aG508RSwawLnnBuo+JDSqYc4cHJO1R1phllhN6GysEhBp/6a4B6+vSFPVapWyAAw==}
+  unplugin-fonts@1.3.1:
+    resolution: {integrity: sha512-GmaJWPAWH6lBI4fP8xKdbMZJwTgsnr8PGJOfQE52jlod8QkqSO4M529Nox2L8zYapjB5hox2wCu4N3c/LOal/A==}
     peerDependencies:
       '@nuxt/kit': ^3.0.0
-      vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
+      vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
     peerDependenciesMeta:
       '@nuxt/kit':
         optional: true
@@ -1836,6 +1836,10 @@ packages:
   unplugin@1.16.0:
     resolution: {integrity: sha512-5liCNPuJW8dqh3+DM6uNM2EI3MLLpCKp/KY+9pB5M2S2SR2qvvDHhKgBOaTWEbZTAws3CXfB0rKTIolWKL05VQ==}
     engines: {node: '>=14.0.0'}
+
+  unplugin@2.0.0-beta.1:
+    resolution: {integrity: sha512-2qzQo5LN2DmUZXkWDHvGKLF5BP0WN+KthD6aPnPJ8plRBIjv4lh5O07eYcSxgO2znNw9s4MNhEO1sB+JDllDbQ==}
+    engines: {node: '>=18.12.0'}
 
   upath@2.0.1:
     resolution: {integrity: sha512-1uEe95xksV1O0CYKXo8vQvN1JEbtJp7lb7C5U9HMsIp6IVwntkH/oNUzyVNQSd4S1sYk2FpSSW44FqMc8qee5w==}
@@ -3843,10 +3847,10 @@ snapshots:
     transitivePeerDependencies:
       - rollup
 
-  unplugin-fonts@1.1.1(vite@5.4.11(@types/node@22.10.1)(sass@1.81.0)):
+  unplugin-fonts@1.3.1(vite@5.4.11(@types/node@22.10.1)(sass@1.81.0)):
     dependencies:
       fast-glob: 3.3.2
-      unplugin: 1.16.0
+      unplugin: 2.0.0-beta.1
       vite: 5.4.11(@types/node@22.10.1)(sass@1.81.0)
 
   unplugin-vue-components@0.27.5(@babel/parser@7.26.2)(rollup@4.28.0)(vue@3.5.13(typescript@5.6.3)):
@@ -3891,6 +3895,11 @@ snapshots:
       - vue
 
   unplugin@1.16.0:
+    dependencies:
+      acorn: 8.14.0
+      webpack-virtual-modules: 0.6.2
+
+  unplugin@2.0.0-beta.1:
     dependencies:
       acorn: 8.14.0
       webpack-virtual-modules: 0.6.2
