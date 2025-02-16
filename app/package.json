@@ -19,12 +19,12 @@
     "vue-router": "^3.5.2",
     "vue-unique-id": "^3.2.1",
     "vuetify": "^2.5.6",
-    "workbox-webpack-plugin": "^6.1.5"
+    "workbox-webpack-plugin": "^7.3.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.13",
-    "@vue/cli-service": "~4.5.13",
-    "compression-webpack-plugin": "^6.1.1",
+    "@vue/cli-service": "~5.0.8",
+    "compression-webpack-plugin": "^11.1.0",
     "css-loader": "^5.2.6",
     "sass": "^1.35.2",
     "sass-loader": "^10.1.1",
