@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
-    "core-js": "^3.40.0",
+    "core-js": "^3.41.0",
     "roboto-fontface": "^0.10.0",
     "vue": "^3.5.13",
     "vuetify": "^3.7.14"
