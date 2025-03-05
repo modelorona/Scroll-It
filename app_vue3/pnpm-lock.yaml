@@ -12,8 +12,8 @@ importers:
         specifier: 7.4.47
         version: 7.4.47
       core-js:
-        specifier: ^3.40.0
-        version: 3.40.0
+        specifier: ^3.41.0
+        version: 3.41.0
       roboto-fontface:
         specifier: ^0.10.0
         version: 0.10.0
@@ -818,8 +818,8 @@ packages:
     resolution: {integrity: sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==}
     engines: {node: '>=12.13'}
 
-  core-js@3.40.0:
-    resolution: {integrity: sha512-7vsMc/Lty6AGnn7uFpYT56QesI5D2Y/UkgKounk87OP9Z2H9Z8kj6jzcSGAxFmUtDOS0ntK6lbQz+Nsa0Jj6mQ==}
+  core-js@3.41.0:
+    resolution: {integrity: sha512-SJ4/EHwS36QMJd6h/Rg+GyR4A5xE0FSI3eZ+iBVpfqf1x0eTSg1smWLHrA+2jQThZSh97fmSgFSU8B61nxosxA==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -2701,7 +2701,7 @@ snapshots:
     dependencies:
       is-what: 4.1.16
 
-  core-js@3.40.0: {}
+  core-js@3.41.0: {}
 
   cross-spawn@7.0.6:
     dependencies:
