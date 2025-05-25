@@ -11,8 +11,3 @@ functionality.
 Furthermore, it should be more mobile-friendly. I used [Vuetify](https://vuetifyjs.com/en/) for the front-end framework.
 
 Hope you enjoy. Feel free to leave any issues.
-
-
-#### Disclaimer
-Code is messy. Vue isn't bad. Front-end is complicated.
-
