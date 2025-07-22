@@ -19,7 +19,7 @@
     "@types/node": "^24.0.10",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/eslint-config-typescript": "^14.6.0",
-    "esbuild": "^0.25.5",
+    "esbuild": "^0.25.8",
     "eslint": "^9.31.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-config-vuetify": "^4.0.0",
