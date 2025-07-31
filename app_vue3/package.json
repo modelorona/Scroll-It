@@ -15,7 +15,7 @@
     "vuetify": "^3.9.2"
   },
   "devDependencies": {
-    "@babel/types": "^7.28.1",
+    "@babel/types": "^7.28.2",
     "@types/node": "^24.0.15",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/eslint-config-typescript": "^14.6.0",
