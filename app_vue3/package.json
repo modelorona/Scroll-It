@@ -12,7 +12,7 @@
     "core-js": "^3.45.0",
     "roboto-fontface": "^0.10.0",
     "vue": "^3.5.18",
-    "vuetify": "^3.9.2"
+    "vuetify": "^3.9.7"
   },
   "devDependencies": {
     "@babel/types": "^7.28.2",
