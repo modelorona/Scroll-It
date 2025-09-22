@@ -21,8 +21,8 @@ importers:
         specifier: ^3.5.21
         version: 3.5.21(typescript@5.8.3)
       vuetify:
-        specifier: ^3.10.0
-        version: 3.10.0(typescript@5.8.3)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.8.3))
+        specifier: ^3.10.2
+        version: 3.10.2(typescript@5.8.3)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.8.3))
     devDependencies:
       '@babel/types':
         specifier: ^7.28.2
@@ -92,7 +92,7 @@ importers:
         version: 0.11.0(vite@7.1.5(@types/node@24.2.1)(jiti@2.4.2)(sass@1.90.0)(yaml@2.8.1))(vue-router@4.5.1(vue@3.5.21(typescript@5.8.3)))(vue@3.5.21(typescript@5.8.3))
       vite-plugin-vuetify:
         specifier: ^2.1.2
-        version: 2.1.2(vite@7.1.5(@types/node@24.2.1)(jiti@2.4.2)(sass@1.90.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.0)
+        version: 2.1.2(vite@7.1.5(@types/node@24.2.1)(jiti@2.4.2)(sass@1.90.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.2)
       vue-router:
         specifier: ^4.5.1
         version: 4.5.1(vue@3.5.21(typescript@5.8.3))
@@ -2716,9 +2716,8 @@ packages:
       typescript:
         optional: true
 
-  vuetify@3.10.0:
-    resolution: {integrity: sha512-cgtssO0yriqwEdOd6jGfUqUUztunxYPDhyY+iog0Q8i5WEa+3+eQ/dGpXeFoU80qMVm0k6uPd8aJpc5wEVXu3g==}
-    engines: {node: ^12.20 || >=14.13}
+  vuetify@3.10.2:
+    resolution: {integrity: sha512-uuAm+uj170ZWdS0aiomhgtdYOR3/I2yzynskBfYyFB1Fn/HKvlvPDaU3ISZnf0GHIJQENdj7eLg/wTChrIwEQw==}
     peerDependencies:
       typescript: '>=4.7'
       vite-plugin-vuetify: '>=2.1.0'
@@ -3660,11 +3659,11 @@ snapshots:
 
   '@vue/shared@3.5.21': {}
 
-  '@vuetify/loader-shared@2.1.1(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.0)':
+  '@vuetify/loader-shared@2.1.1(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.2)':
     dependencies:
       upath: 2.0.1
       vue: 3.5.21(typescript@5.8.3)
-      vuetify: 3.10.0(typescript@5.8.3)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.8.3))
+      vuetify: 3.10.2(typescript@5.8.3)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.8.3))
 
   acorn-jsx@5.3.2(acorn@8.14.1):
     dependencies:
@@ -5581,14 +5580,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vuetify@2.1.2(vite@7.1.5(@types/node@24.2.1)(jiti@2.4.2)(sass@1.90.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.0):
+  vite-plugin-vuetify@2.1.2(vite@7.1.5(@types/node@24.2.1)(jiti@2.4.2)(sass@1.90.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.2):
     dependencies:
-      '@vuetify/loader-shared': 2.1.1(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.0)
+      '@vuetify/loader-shared': 2.1.1(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.2)
       debug: 4.4.1
       upath: 2.0.1
       vite: 7.1.5(@types/node@24.2.1)(jiti@2.4.2)(sass@1.90.0)(yaml@2.8.1)
       vue: 3.5.21(typescript@5.8.3)
-      vuetify: 3.10.0(typescript@5.8.3)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.8.3))
+      vuetify: 3.10.2(typescript@5.8.3)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.8.3))
     transitivePeerDependencies:
       - supports-color
 
@@ -5668,12 +5667,12 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.3
 
-  vuetify@3.10.0(typescript@5.8.3)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.8.3)):
+  vuetify@3.10.2(typescript@5.8.3)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.8.3)):
     dependencies:
       vue: 3.5.21(typescript@5.8.3)
     optionalDependencies:
       typescript: 5.8.3
-      vite-plugin-vuetify: 2.1.2(vite@7.1.5(@types/node@24.2.1)(jiti@2.4.2)(sass@1.90.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.0)
+      vite-plugin-vuetify: 2.1.2(vite@7.1.5(@types/node@24.2.1)(jiti@2.4.2)(sass@1.90.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.8.3))(vuetify@3.10.2)
 
   webpack-virtual-modules@0.6.2: {}
 
