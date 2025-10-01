@@ -22,7 +22,7 @@
     "esbuild": "^0.25.10",
     "eslint": "^9.32.0",
     "eslint-config-standard": "^17.1.0",
-    "eslint-config-vuetify": "^4.0.0",
+    "eslint-config-vuetify": "^4.2.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-n": "^17.21.3",
     "eslint-plugin-node": "^11.1.0",
