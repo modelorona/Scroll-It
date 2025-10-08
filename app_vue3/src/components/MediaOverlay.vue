@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-  import { ref, watch, nextTick } from 'vue'
+  import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 
   const props = defineProps({
     modelValue: Boolean,

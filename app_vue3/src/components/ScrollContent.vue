@@ -1,5 +1,5 @@
 <template>
-  <v-container align-content="start" fluid>
+  <v-container align-content="start" fluid class="px-md-4">
 
     <SearchBar
       v-model:sortOption="sortOption"
@@ -41,6 +41,7 @@
       :fetching-images="fetchingImages"
       :posts="visiblePosts"
       @select-image="setOverlayImage"
+      @load-more="fetchRedditImages"
     />
 
     <MediaOverlay
@@ -58,8 +59,6 @@
       @toggle-slideshow="toggleSlideshow"
       @media-ended="handleMediaEnded"
     />
-
-    <div ref="bottomRef" />
   </v-container>
 </template>
 
@@ -80,7 +79,6 @@
   const currentImageIndex = ref(0)
   const isPlaying = ref(false)
   const after = ref(null)
-  const bottomRef = ref(null)
   const imageOverlay = ref(false)
   const fetchingImages = ref(false)
   const infoBannerVisible = ref(true)
@@ -274,19 +272,7 @@
     return agreedToNSFW.value ? posts.value : posts.value.filter(post => !post.postData.over_18)
   })
 
-  watch(bottomRef, newVal => {
-    if (newVal) {
-      const observer = new IntersectionObserver(
-        entries => {
-          if (visiblePosts.value.length > 0 && entries[0].isIntersecting) {
-            fetchRedditImages()
-          }
-        },
-        { rootMargin: '0px', threshold: 1.0 }
-      )
-      observer.observe(bottomRef.value)
-    }
-  })
+  
 
   watch(currentIndex, newValue => {
     if (newValue >= visiblePosts.value.length - 6) {
