@@ -26,10 +26,15 @@
         </div>
       </v-app-bar-title>
 
+      <v-btn @click="settingsDialog = true">
+        <v-icon large>mdi-cog</v-icon>
+      </v-btn>
+
       <v-dialog max-width="500">
         <template #activator="{ props: activatorProps }">
           <v-btn v-bind="activatorProps">
-            <v-icon large>mdi-information</v-icon></v-btn>
+            <v-icon large>mdi-information</v-icon>
+          </v-btn>
         </template>
 
         <template #default="{ isActive }">
@@ -86,9 +91,13 @@
     </v-app-bar>
 
     <ScrollContent />
+    <SettingsDialog v-model="settingsDialog" />
   </v-container>
 </template>
 
 <script setup lang="ts">
-//
+import { ref } from 'vue'
+import SettingsDialog from './SettingsDialog.vue'
+
+const settingsDialog = ref(false)
 </script>

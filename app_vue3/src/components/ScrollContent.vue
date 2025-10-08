@@ -43,9 +43,10 @@
       @select-image="setOverlayImage"
     />
 
-    <ImageOverlay
-      v-model:imageOverlay="imageOverlay"
-      :current-post-url="currentPostUrl"
+    <MediaOverlay
+      v-model="imageOverlay"
+      :current-post="currentPost"
+      :current-image-index="currentImageIndex"
       :has-next="hasNext"
       :has-previous="hasPrevious"
       :is-playing="isPlaying"
@@ -55,6 +56,7 @@
       @skip-post="skipPost"
       @stop-slideshow="stopSlideshow"
       @toggle-slideshow="toggleSlideshow"
+      @media-ended="handleMediaEnded"
     />
 
     <div ref="bottomRef" />
@@ -64,7 +66,10 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
+  import { useSettingsStore } from '@/stores/settings'
+  import MediaOverlay from './MediaOverlay.vue'
 
+  const settingsStore = useSettingsStore()
   const route = useRoute()
   const subreddit = ref(route.params.subreddit || '')
   const sortOption = ref(route.query.type || 'hot')
@@ -80,7 +85,7 @@
   const fetchingImages = ref(false)
   const infoBannerVisible = ref(true)
 
-  const slideshowIntervalTime = 5000 // 5 seconds per image
+  const slideshowIntervalTimeMs = computed(() => settingsStore.slideshowInterval * 1000)
   let slideshowInterval = null
 
   const fetchRedditImages = async (reset = false) => {
@@ -100,17 +105,40 @@
       const processedPosts = data.data.children
         .map(post => {
           const { data } = post
+          // Album / Gallery
           if (data.is_gallery) {
             const images = Object.keys(data.media_metadata).map(id => {
               const media = data.media_metadata[id]
-              // Find the best quality image that is not a gif
               const bestQuality = media.p.find(q => q.x > 1000) || media.s
               return bestQuality.u.replace(/&amp;/g, '&')
             })
-            return { postData: data, images, isAlbum: true }
+            return { postData: data, images, isAlbum: true, mediaType: 'album' }
           }
+          // Standard Image
           if (data.post_hint === 'image' && !data.is_self) {
-            return { postData: data, images: [data.url], isAlbum: false }
+            return { postData: data, images: [data.url], isAlbum: false, mediaType: 'image' }
+          }
+          // Reddit-hosted Video
+          if (data.is_video && data.post_hint === 'hosted:video') {
+            const videoUrl = data.secure_media?.reddit_video?.fallback_url
+            if (videoUrl) {
+              return { postData: data, images: [videoUrl], isAlbum: false, mediaType: 'video' }
+            }
+          }
+          // Embeds (YouTube, etc.) and direct GIFs (Gfycat, Imgur)
+          if (data.post_hint === 'rich:video') {
+            // Direct GIF/MP4
+            if (data.domain === 'gfycat.com' || data.domain === 'i.imgur.com') {
+              const videoUrl = data.preview?.images[0]?.variants?.mp4?.source?.url
+              if (videoUrl) {
+                return { postData: data, images: [videoUrl.replace(/&amp;/g, '&')], isAlbum: false, mediaType: 'video' }
+              }
+            }
+            // Embedded Player
+            if (data.secure_media?.oembed?.html) {
+              const html = data.secure_media.oembed.html.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+              return { postData: data, images: [html], isAlbum: false, mediaType: 'embed' }
+            }
           }
           return null
         })
@@ -132,7 +160,12 @@
     if (isPlaying.value) return
     isPlaying.value = true
     setOverlayImage(startingIndex)
-    slideshowInterval = setInterval(slideshowNext, slideshowIntervalTime)
+    
+    const post = visiblePosts.value[currentIndex.value]
+    // Only start the timer for non-video posts
+    if (post.mediaType !== 'video') {
+      slideshowInterval = setInterval(slideshowNext, slideshowIntervalTimeMs.value)
+    }
   }
 
   const setOverlayImage = index => {
@@ -143,8 +176,8 @@
 
   const stopSlideshow = () => {
     if (!isPlaying.value) return
-
     clearInterval(slideshowInterval)
+    slideshowInterval = null
     isPlaying.value = false
   }
 
@@ -152,10 +185,16 @@
 
   const slideshowNext = () => {
     const currentPost = visiblePosts.value[currentIndex.value]
-    if (currentPost.isAlbum && currentImageIndex.value < currentPost.images.length - 1) {
+    if (currentPost.mediaType === 'album' && currentImageIndex.value < currentPost.images.length - 1) {
       currentImageIndex.value++
     } else {
       nextImage()
+    }
+  }
+  
+  const handleMediaEnded = () => {
+    if (isPlaying.value) {
+      slideshowNext()
     }
   }
 
@@ -169,6 +208,15 @@
     } else if (currentIndex.value < visiblePosts.value.length - 1) {
       currentIndex.value++
       currentImageIndex.value = 0
+    }
+    
+    // If slideshow is active, reset the interval for the next item
+    if (isPlaying.value) {
+      clearInterval(slideshowInterval)
+      const nextPost = visiblePosts.value[currentIndex.value]
+      if (nextPost.mediaType !== 'video') {
+        slideshowInterval = setInterval(slideshowNext, slideshowIntervalTimeMs.value)
+      }
     }
   }
 
@@ -212,17 +260,14 @@
     isNSFWDialogOpen.value = false
   }
 
-  const currentPostUrl = computed(() => {
-    const post = visiblePosts.value[currentIndex.value]
-    return post?.images[currentImageIndex.value]
-  })
+  const currentPost = computed(() => visiblePosts.value[currentIndex.value])
 
   const hasPrevious = computed(() => currentIndex.value > 0 || currentImageIndex.value > 0)
   const hasNext = computed(() => {
     if (visiblePosts.value.length === 0) return false
     const lastPostIndex = visiblePosts.value.length - 1
-    const currentPost = visiblePosts.value[currentIndex.value]
-    return currentIndex.value < lastPostIndex || (currentPost && currentImageIndex.value < currentPost.images.length - 1)
+    const post = visiblePosts.value[currentIndex.value]
+    return currentIndex.value < lastPostIndex || (post && currentImageIndex.value < post.images.length - 1)
   })
 
   const visiblePosts = computed(() => {

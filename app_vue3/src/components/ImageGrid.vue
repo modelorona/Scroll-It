@@ -9,11 +9,12 @@
       >
         <v-card v-if="!post.postData.over_18 || agreedToNSFW">
           <div class="image-container">
-            <v-icon v-if="post.isAlbum" class="album-icon">mdi-image-multiple</v-icon>
+            <v-icon v-if="post.mediaType === 'album'" class="album-icon">mdi-image-multiple</v-icon>
+            <v-icon v-if="post.mediaType === 'video' || post.mediaType === 'embed'" class="video-icon">mdi-play-circle</v-icon>
             <v-img
               :aspect-ratio="1"
               class="link-cursor"
-              :src="post.postData.thumbnail.startsWith('http') ? post.postData.thumbnail : (post.isAlbum ? post.images[0] : post.postData.url)"
+              :src="getThumbnail(post)"
               @click="$emit('selectImage', index)"
             />
           </div>
@@ -21,11 +22,11 @@
           <v-card-actions>
             <v-btn
               color="primary"
-              :href="post.postData.url"
+              :href="`https://reddit.com${post.postData.permalink}`"
               target="_blank"
               text
             >
-              View Image On Reddit
+              View Post On Reddit
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -52,6 +53,27 @@ const props = defineProps({
 });
 
 defineEmits(["selectImage"]);
+
+const getThumbnail = (post) => {
+  // Use the thumbnail from post data if it's a valid URL
+  if (post.postData.thumbnail && post.postData.thumbnail.startsWith('http')) {
+    return post.postData.thumbnail;
+  }
+  // Fallback for videos/embeds to a higher quality preview if available
+  if ((post.mediaType === 'video' || post.mediaType === 'embed') && post.postData.preview?.images[0]?.source?.url) {
+    return post.postData.preview.images[0].source.url.replace(/&amp;/g, '&');
+  }
+  // Fallback for albums to the first image
+  if (post.mediaType === 'album') {
+    return post.images[0];
+  }
+  // Fallback for single images to the direct URL
+  if (post.mediaType === 'image') {
+    return post.postData.url;
+  }
+  // If all else fails, return empty so v-img can show a placeholder
+  return '';
+};
 
 const loadingMessage = ref("Fetching images...");
 let timeoutId = null;
@@ -93,14 +115,20 @@ watch(
 .image-container {
   position: relative;
 }
-.album-icon {
+.album-icon, .video-icon {
   position: absolute;
-  top: 8px;
-  right: 8px;
   color: white;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   border-radius: 4px;
   padding: 2px;
   z-index: 1;
+}
+.album-icon {
+  top: 8px;
+  right: 8px;
+}
+.video-icon {
+  top: 8px;
+  left: 8px;
 }
 </style>

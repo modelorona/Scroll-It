@@ -1,29 +1,55 @@
 <template>
   <v-dialog
-    v-model="imageOverlay"
-    max-height="100vh"
-    max-width="100vw"
+    v-model="dialog"
+    fullscreen
+    hide-overlay
+    transition="dialog-bottom-transition"
     @after-leave="close"
     @keydown.esc="close"
   >
-    <v-card class="full-size-card">
+    <v-card class="full-size-card" color="black">
+      <v-icon class="close-button" color="white" title="Close" @click="close">mdi-close</v-icon>
+      
       <v-card-text class="full-size-card-text">
         <v-progress-circular
-          v-if="imageLoading"
+          v-if="mediaLoading"
           class="loader"
           color="primary"
           indeterminate
           size="64"
         />
-        <v-icon color="white" title="Close" @click="close">mdi-close</v-icon>
-        <v-img
-          :key="currentPostUrl"
-          class="full-size-image"
-          :src="currentPostUrl"
-          @load="imageLoading = false"
-        />
+        
+        <div v-if="currentPost" class="media-wrapper">
+          <v-img
+            v-if="currentPost.mediaType === 'image' || currentPost.mediaType === 'album'"
+            :key="currentPost.images[currentImageIndex]"
+            class="full-size-media"
+            :src="currentPost.images[currentImageIndex]"
+            @load="mediaLoading = false"
+          />
+          <video
+            v-else-if="currentPost.mediaType === 'video'"
+            :key="currentPost.images[0]"
+            class="full-size-media"
+            autoplay
+            loop
+            muted
+            controls
+            @loadeddata="mediaLoading = false"
+            @ended="$emit('mediaEnded')"
+          >
+            <source :src="currentPost.images[0]" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div
+            v-else-if="currentPost.mediaType === 'embed'"
+            class="embed-container"
+            v-html="currentPost.images[0]"
+          ></div>
+        </div>
       </v-card-text>
-      <v-card-actions>
+      
+      <v-card-actions class="actions-bar">
         <div v-if="showTooltip" class="tooltip">
           Use <kbd>←</kbd>, <kbd>→</kbd> to navigate, <kbd>Space</kbd> to toggle slideshow, and <kbd>Esc</kbd> to close
         </div>
@@ -41,41 +67,56 @@
   </v-dialog>
 </template>
 
-  <script setup>
-  import { ref, watch } from 'vue'
+<script setup>
+  import { ref, watch, nextTick } from 'vue'
 
   const props = defineProps({
-    imageOverlay: Boolean,
-    currentPostUrl: String,
+    modelValue: Boolean,
+    currentPost: Object,
+    currentImageIndex: Number,
     hasPrevious: Boolean,
     hasNext: Boolean,
     isPlaying: Boolean,
   })
 
-  const emit = defineEmits(['update:imageOverlay', 'goToLink', 'prevImage', 'nextImage', 'toggleSlideshow', 'stopSlideshow', 'skipPost'])
+  const emit = defineEmits(['update:modelValue', 'goToLink', 'prevImage', 'nextImage', 'toggleSlideshow', 'stopSlideshow', 'skipPost', 'mediaEnded'])
 
-  const imageOverlay = ref(props.imageOverlay)
-  const imageLoading = ref(true)
+  const dialog = ref(props.modelValue)
+  const mediaLoading = ref(true)
   const showTooltip = ref(false)
 
-  watch(() => props.imageOverlay, newValue => {
-    imageOverlay.value = newValue
-    if (newValue) showShortcutTooltip()
+  watch(() => props.modelValue, newValue => {
+    dialog.value = newValue
+    if (newValue) {
+      mediaLoading.value = true
+      showShortcutTooltip()
+    }
   })
 
-  watch(imageOverlay, newValue => {
-    emit('update:imageOverlay', newValue)
+  watch(dialog, newValue => {
+    emit('update:modelValue', newValue)
+  })
+  
+  watch(() => props.currentPost, async (newPost) => {
+    mediaLoading.value = true
+    if (newPost && newPost.mediaType === 'embed') {
+      await nextTick()
+      // The iframe doesn't have a reliable load event we can capture here.
+      // We'll assume it loads reasonably quickly and hide the loader.
+      setTimeout(() => {
+        mediaLoading.value = false
+      }, 1000)
+    }
   })
 
   const close = () => {
     emit('stopSlideshow')
-    imageOverlay.value = false
+    dialog.value = false
   }
 
   // Function to show the tooltip
   const showShortcutTooltip = () => {
     showTooltip.value = true
-    console.log("here")
     setTimeout(() => {
       showTooltip.value = false // Auto-hide after 3 seconds
     }, 5000)
@@ -83,7 +124,7 @@
 
   // Global keydown handler
   const handleKeydown = (event) => {
-    if (!imageOverlay.value) return // Only handle keys if the dialog is open
+    if (!dialog.value) return // Only handle keys if the dialog is open
 
     switch (event.key) {
       case 'ArrowLeft':
@@ -116,50 +157,70 @@
   onUnmounted(() => {
     window.removeEventListener('keydown', handleKeydown)
   })
-  </script>
+</script>
 
 <style scoped>
 .full-size-card {
   height: 100vh;
   width: 100vw;
+  display: flex;
+  flex-direction: column;
 }
 .full-size-card-text {
-  height: 94vh;
-  width: 100vw;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 !important;
 }
-.full-size-image {
+.media-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.full-size-media {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+.embed-container {
+  width: 100%;
+  max-width: 90vw; /* Limit width of embed */
+  aspect-ratio: 16 / 9; /* Common video aspect ratio */
+  background: black;
+}
+.embed-container ::v-deep(iframe) {
+  width: 100%;
+  height: 100%;
 }
 .loader {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 10;
 }
-
-@media (max-width: 768px) {
-  .full-size-card {
-    height: auto;
-    width: auto;
-  }
-  .full-size-card-text {
-    height: auto;
-    width: auto;
-  }
-  .full-size-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
+.close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+  cursor: pointer;
 }
-.v-card-actions {
-  position: relative;
+.actions-bar {
+  flex-shrink: 0; /* Prevent the actions bar from shrinking */
+  background-color: rgba(0, 0, 0, 0.5);
+  position: relative; /* Needed for tooltip positioning */
 }
 .tooltip {
   position: absolute;
-  top: -40px;
+  bottom: 100%; /* Position above the actions bar */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
   background-color: #333;
   color: #fff;
   padding: 10px;
@@ -167,22 +228,19 @@
   font-size: 14px;
   text-align: center;
   z-index: 10;
-  right: 38%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: opacity 0.3s ease;
 }
-
 .tooltip::after {
   content: '';
   position: absolute;
-  bottom: -8px; /* Adjust to align the arrow */
+  top: 100%; /* Arrow points down */
   left: 50%;
   transform: translateX(-50%);
   border-width: 8px;
   border-style: solid;
   border-color: #333 transparent transparent transparent;
 }
-
 kbd {
   background-color: #eee;
   border: 1px solid #ccc;
