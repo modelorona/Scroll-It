@@ -1,11 +1,12 @@
 {
   "name": "app_vue3",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --fix --ignore-pattern /dist"
+    "lint": "eslint . --fix"
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
@@ -23,15 +24,16 @@
     "esbuild": "^0.25.10",
     "eslint": "^9.32.0",
     "eslint-config-standard": "^17.1.0",
-    "eslint-config-vuetify": "^4.2.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-n": "^17.23.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-vue": "^10.4.0",
+    "eslint-plugin-vuetify": "^2.5.3",
     "pinia": "^3.0.3",
     "sass": "1.90.0",
     "typescript": "5.8.3",
+    "typescript-eslint": "^8.46.0",
     "unplugin-auto-import": "^20.2.0",
     "unplugin-fonts": "^1.4.0",
     "unplugin-vue-components": "^29.1.0",

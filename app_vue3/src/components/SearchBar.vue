@@ -1,6 +1,9 @@
 <template>
   <v-row>
-    <v-col cols="12" md="12">
+    <v-col
+      cols="12"
+      md="12"
+    >
       <v-text-field
         v-model="subreddit"
         clearable
@@ -9,12 +12,24 @@
         @keyup.enter="search"
       >
         <template #append-inner>
-          <v-btn icon title="Reset" size="small" @click="reset" class="mx-1">
+          <v-btn
+            icon
+            title="Reset"
+            size="small"
+            class="mx-1"
+            @click="reset"
+          >
             <v-icon>mdi-restore</v-icon>
           </v-btn>
           <v-menu>
-            <template #activator="{ props }">
-              <v-btn v-bind="props" icon title="Sort By" size="small" class="mx-1">
+            <template #activator="{ props: menuProps }">
+              <v-btn
+                v-bind="menuProps"
+                icon
+                title="Sort By"
+                size="small"
+                class="mx-1"
+              >
                 <v-icon>mdi-sort</v-icon>
               </v-btn>
             </template>
@@ -27,12 +42,20 @@
               >
                 <v-list-item-title>
                   {{ item }}
-                  <v-icon v-if="item === sortOption">mdi-check</v-icon>
+                  <v-icon v-if="item === sortOption">
+                    mdi-check
+                  </v-icon>
                 </v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
-          <v-btn color="secondary" icon title="Search" size="small" @click="search">
+          <v-btn
+            color="secondary"
+            icon
+            title="Search"
+            size="small"
+            @click="search"
+          >
             <v-icon>mdi-send</v-icon>
           </v-btn>
         </template>
@@ -45,8 +68,14 @@
   import { ref, watch } from 'vue'
 
   const props = defineProps({
-    subreddit: String,
-    sortOption: String,
+    subreddit: {
+      type: String,
+      default: '',
+    },
+    sortOption: {
+      type: String,
+      default: 'hot',
+    },
   })
 
   const emit = defineEmits(['update:subreddit', 'update:sortOption', 'search', 'reset'])

@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     ImageGrid: typeof import('./components/ImageGrid.vue')['default']
+    ImageGridSkeleton: typeof import('./components/ImageGridSkeleton.vue')['default']
     Main: typeof import('./components/Main.vue')['default']
     MediaOverlay: typeof import('./components/MediaOverlay.vue')['default']
     NSFWAlert: typeof import('./components/NSFWAlert.vue')['default']

@@ -2,13 +2,23 @@
   <v-dialog
     v-model="dialog"
     fullscreen
-    hide-overlay
+    :scrim="false"
     transition="dialog-bottom-transition"
     @after-leave="close"
     @keydown.esc="close"
   >
-    <v-card class="full-size-card" color="black">
-      <v-icon class="close-button" color="white" title="Close" @click="close">mdi-close</v-icon>
+    <v-card
+      class="full-size-card"
+      color="black"
+    >
+      <v-icon
+        class="close-button"
+        color="white"
+        title="Close"
+        @click="close"
+      >
+        mdi-close
+      </v-icon>
       
       <v-card-text class="full-size-card-text">
         <v-progress-circular
@@ -19,7 +29,10 @@
           size="64"
         />
         
-        <div v-if="currentPost" class="media-wrapper">
+        <div
+          v-if="currentPost"
+          class="media-wrapper"
+        >
           <v-img
             v-if="currentPost.mediaType === 'image' || currentPost.mediaType === 'album'"
             :key="currentPost.images[currentImageIndex]"
@@ -38,28 +51,64 @@
             @loadeddata="mediaLoading = false"
             @ended="$emit('mediaEnded')"
           >
-            <source :src="currentPost.images[0]" type="video/mp4">
+            <source
+              :src="currentPost.images[0]"
+              type="video/mp4"
+            >
             Your browser does not support the video tag.
           </video>
           <div
             v-else-if="currentPost.mediaType === 'embed'"
             class="embed-container"
             v-html="currentPost.images[0]"
-          ></div>
+          />
         </div>
       </v-card-text>
       
       <v-card-actions class="actions-bar">
-        <div v-if="showTooltip" class="tooltip">
+        <div
+          v-if="showTooltip"
+          class="tooltip"
+        >
           Use <kbd>←</kbd>, <kbd>→</kbd> to navigate, <kbd>Space</kbd> to toggle slideshow, and <kbd>Esc</kbd> to close
         </div>
-        <v-row align="center" class="flex-wrap" justify="center">
-          <v-btn color="primary" @click="$emit('goToLink')"><v-icon>mdi-open-in-new</v-icon> Reddit</v-btn>
-          <v-btn :disabled="!hasPrevious" @click="$emit('prevImage')" @keydown.left.prevent="$emit('prevImage')"><v-icon>mdi-arrow-left</v-icon>Previous</v-btn>
-          <v-btn :disabled="!hasNext" @click="$emit('nextImage')" @keydown.right.prevent="$emit('nextImage')">Next<v-icon>mdi-arrow-right</v-icon></v-btn>
-          <v-btn @click="$emit('skipPost')">Skip Post<v-icon>mdi-fast-forward</v-icon></v-btn>
-          <v-btn @click="$emit('toggleSlideshow')" @keydown.space.prevent="$emit('toggleSlideshow')">
-            {{ isPlaying ? 'Pause Slideshow' : 'Start Slideshow' }} <v-icon v-if="isPlaying">mdi-pause</v-icon> <v-icon v-else>mdi-play</v-icon>
+        <v-row
+          align="center"
+          class="flex-wrap"
+          justify="center"
+        >
+          <v-btn
+            color="primary"
+            @click="$emit('goToLink')"
+          >
+            <v-icon>mdi-open-in-new</v-icon> Reddit
+          </v-btn>
+          <v-btn
+            :disabled="!hasPrevious"
+            @click="$emit('prevImage')"
+            @keydown.left.prevent="$emit('prevImage')"
+          >
+            <v-icon>mdi-arrow-left</v-icon>Previous
+          </v-btn>
+          <v-btn
+            :disabled="!hasNext"
+            @click="$emit('nextImage')"
+            @keydown.right.prevent="$emit('nextImage')"
+          >
+            Next<v-icon>mdi-arrow-right</v-icon>
+          </v-btn>
+          <v-btn @click="$emit('skipPost')">
+            Skip Post<v-icon>mdi-fast-forward</v-icon>
+          </v-btn>
+          <v-btn
+            @click="$emit('toggleSlideshow')"
+            @keydown.space.prevent="$emit('toggleSlideshow')"
+          >
+            {{ isPlaying ? 'Pause Slideshow' : 'Start Slideshow' }} <v-icon v-if="isPlaying">
+              mdi-pause
+            </v-icon> <v-icon v-else>
+              mdi-play
+            </v-icon>
           </v-btn>
         </v-row>
       </v-card-actions>
@@ -72,8 +121,14 @@
 
   const props = defineProps({
     modelValue: Boolean,
-    currentPost: Object,
-    currentImageIndex: Number,
+    currentPost: {
+      type: Object,
+      default: () => ({}),
+    },
+    currentImageIndex: {
+      type: Number,
+      default: 0,
+    },
     hasPrevious: Boolean,
     hasNext: Boolean,
     isPlaying: Boolean,

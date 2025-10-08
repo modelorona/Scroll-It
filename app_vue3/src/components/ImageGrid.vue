@@ -41,14 +41,14 @@
         </v-row>
       </div>
     </div>
-
-    <v-row v-if="fetchingImages">
-      <v-banner icon="mdi-download">
-        <template v-slot:text>
-          <span v-html="loadingMessage"></span>
-        </template>
-      </v-banner>
-    </v-row>
+    <v-fab
+      v-if="showBackToTop"
+      icon="mdi-arrow-up"
+      class="ma-4 mb-12"
+      location="bottom end"
+      fixed
+      @click="scrollToTop"
+    />
   </v-container>
 </template>
 
@@ -58,17 +58,33 @@ import { useVirtualList } from "@vueuse/core";
 import logo from "@/assets/logo-white.png";
 
 const props = defineProps({
-  posts: Array,
+  posts: {
+    type: Array,
+    default: () => [],
+  },
   agreedToNSFW: Boolean,
   fetchingImages: Boolean,
 });
 
 const emit = defineEmits(["selectImage", "loadMore"]);
 
+const showBackToTop = ref(false);
+
 const handleScroll = (event) => {
   const { scrollTop, clientHeight, scrollHeight } = event.target;
   if (scrollTop + clientHeight >= scrollHeight - 500) { // 500px threshold
     emit("loadMore");
+  }
+  showBackToTop.value = scrollTop > 200;
+};
+
+const scrollToTop = () => {
+  const container = document.querySelector('.virtual-scroll-container');
+  if (container) {
+    container.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   }
 };
 
@@ -111,73 +127,4 @@ const getThumbnail = (post) => {
   // If all else fails, return empty to trigger the error slot
   return '';
 };
-
-const loadingMessage = ref("Fetching images...");
-let timeoutId = null;
-
-watch(
-  () => props.fetchingImages,
-  (newVal) => {
-    if (newVal) {
-      // Reset message
-      loadingMessage.value = "Fetching images...";
-
-      // Clear any old timers
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-
-      // Set new timer
-      timeoutId = setTimeout(() => {
-        loadingMessage.value =
-          `Fetching images taking too long? Subreddit may not exist or Reddit may be blocking your request due to your location. 
-          Check out <a href="https://protonvpn.com" target="_blank" rel="noopener noreferrer">ProtonVPN</a> 
-          or <a href="https://mullvad.net" target="_blank" rel="noopener noreferrer">Mullvad</a>.`;
-      }, 2000);
-    } else {
-      // Stop timer if fetching finished early
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-    }
-  }
-);
 </script>
-
-<style scoped>
-.virtual-scroll-container {
-  height: calc(100vh - 104px); /* App bar (64px) + Footer (40px) */
-  overflow-y: auto;
-}
-.link-cursor {
-  cursor: pointer;
-}
-.image-container {
-  position: relative;
-  background-color: #212121; /* Dark background for consistency */
-}
-.album-icon, .video-icon {
-  position: absolute;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 4px;
-  padding: 2px;
-  z-index: 1;
-}
-.album-icon {
-  top: 8px;
-  right: 8px;
-}
-.video-icon {
-  top: 8px;
-  left: 8px;
-}
-.placeholder-image {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  opacity: 0.3;
-}
-</style>
