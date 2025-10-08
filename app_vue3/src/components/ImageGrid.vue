@@ -3,22 +3,25 @@
     <v-row v-if="posts.length > 0">
       <v-col
         v-for="(post, index) in posts"
-        :key="post.data.id"
+        :key="post.postData.id"
         cols="12"
         md="4"
       >
-        <v-card v-if="!post.data.over_18 || agreedToNSFW">
-          <v-img
-            :aspect-ratio="1"
-            class="link-cursor"
-            :src="post.data.url"
-            @click="$emit('selectImage', index)"
-          />
-          <v-card-title>{{ post.data.title }}</v-card-title>
+        <v-card v-if="!post.postData.over_18 || agreedToNSFW">
+          <div class="image-container">
+            <v-icon v-if="post.isAlbum" class="album-icon">mdi-image-multiple</v-icon>
+            <v-img
+              :aspect-ratio="1"
+              class="link-cursor"
+              :src="post.isAlbum ? post.images[0] : post.postData.url"
+              @click="$emit('selectImage', index)"
+            />
+          </div>
+          <v-card-title>{{ post.postData.title }}</v-card-title>
           <v-card-actions>
             <v-btn
               color="primary"
-              :href="post.data.url"
+              :href="post.postData.url"
               target="_blank"
               text
             >
@@ -86,5 +89,18 @@ watch(
 <style scoped>
 .link-cursor {
   cursor: pointer;
+}
+.image-container {
+  position: relative;
+}
+.album-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  padding: 2px;
+  z-index: 1;
 }
 </style>

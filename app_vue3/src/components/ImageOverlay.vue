@@ -31,6 +31,7 @@
           <v-btn color="primary" @click="$emit('goToLink')"><v-icon>mdi-open-in-new</v-icon> Reddit</v-btn>
           <v-btn :disabled="!hasPrevious" @click="$emit('prevImage')" @keydown.left.prevent="$emit('prevImage')"><v-icon>mdi-arrow-left</v-icon>Previous</v-btn>
           <v-btn :disabled="!hasNext" @click="$emit('nextImage')" @keydown.right.prevent="$emit('nextImage')">Next<v-icon>mdi-arrow-right</v-icon></v-btn>
+          <v-btn @click="$emit('skipPost')">Skip Post<v-icon>mdi-fast-forward</v-icon></v-btn>
           <v-btn @click="$emit('toggleSlideshow')" @keydown.space.prevent="$emit('toggleSlideshow')">
             {{ isPlaying ? 'Pause Slideshow' : 'Start Slideshow' }} <v-icon v-if="isPlaying">mdi-pause</v-icon> <v-icon v-else>mdi-play</v-icon>
           </v-btn>
@@ -51,7 +52,7 @@
     isPlaying: Boolean,
   })
 
-  const emit = defineEmits(['update:imageOverlay', 'goToLink', 'prevImage', 'nextImage', 'toggleSlideshow', 'stopSlideshow'])
+  const emit = defineEmits(['update:imageOverlay', 'goToLink', 'prevImage', 'nextImage', 'toggleSlideshow', 'stopSlideshow', 'skipPost'])
 
   const imageOverlay = ref(props.imageOverlay)
   const imageLoading = ref(true)

@@ -52,6 +52,7 @@
       @go-to-link="goToLink"
       @next-image="nextImage"
       @prev-image="prevImage"
+      @skip-post="skipPost"
       @stop-slideshow="stopSlideshow"
       @toggle-slideshow="toggleSlideshow"
     />
@@ -71,6 +72,7 @@
   const isNSFWDialogOpen = ref(false)
   const agreedToNSFW = ref(sessionStorage.getItem('agreedToNSFW') === 'true')
   const currentIndex = ref(0)
+  const currentImageIndex = ref(0)
   const isPlaying = ref(false)
   const after = ref(null)
   const bottomRef = ref(null)
@@ -88,19 +90,36 @@
       posts.value = []
       after.value = null
       currentIndex.value = 0
+      currentImageIndex.value = 0
     }
     fetchingImages.value = true
     try {
       const url = `https://www.reddit.com/r/${subreddit.value}/${sortOption.value}.json?limit=50${after.value ? `&after=${after.value}` : ''}`
       const response = await fetch(url)
       const data = await response.json()
-      const filteredPosts = data.data.children.filter(item => item.data.post_hint === 'image' && !item.data.is_self)
+      const processedPosts = data.data.children
+        .map(post => {
+          const { data } = post
+          if (data.is_gallery) {
+            const images = Object.keys(data.media_metadata).map(id => {
+              const media = data.media_metadata[id]
+              // Find the best quality image that is not a gif
+              const bestQuality = media.p.find(q => q.x > 1000) || media.s
+              return bestQuality.u.replace(/&amp;/g, '&')
+            })
+            return { postData: data, images, isAlbum: true }
+          }
+          if (data.post_hint === 'image' && !data.is_self) {
+            return { postData: data, images: [data.url], isAlbum: false }
+          }
+          return null
+        })
+        .filter(Boolean)
 
-      posts.value = reset ? filteredPosts : [...posts.value, ...filteredPosts]
+      posts.value = reset ? processedPosts : [...posts.value, ...processedPosts]
       after.value = data.data.after
 
-      if (!agreedToNSFW.value && posts.value.some(post => post.data.over_18)) {
-        console.log(typeof agreedToNSFW.value)
+      if (!agreedToNSFW.value && posts.value.some(p => p.postData.over_18)) {
         isNSFWDialogOpen.value = true
       }
       fetchingImages.value = false
@@ -113,12 +132,13 @@
     if (isPlaying.value) return
     isPlaying.value = true
     setOverlayImage(startingIndex)
-    slideshowInterval = setInterval(nextImage, slideshowIntervalTime)
+    slideshowInterval = setInterval(slideshowNext, slideshowIntervalTime)
   }
 
   const setOverlayImage = index => {
     imageOverlay.value = true
     currentIndex.value = index
+    currentImageIndex.value = 0
   }
 
   const stopSlideshow = () => {
@@ -130,19 +150,48 @@
 
   const toggleSlideshow = () => isPlaying.value ? stopSlideshow() : startSlideshow()
 
+  const slideshowNext = () => {
+    const currentPost = visiblePosts.value[currentIndex.value]
+    if (currentPost.isAlbum && currentImageIndex.value < currentPost.images.length - 1) {
+      currentImageIndex.value++
+    } else {
+      nextImage()
+    }
+  }
+
   const nextImage = () => {
     if (currentIndex.value >= visiblePosts.value.length - 4) {
       fetchRedditImages()
     }
-    currentIndex.value = (currentIndex.value + 1) % visiblePosts.value.length
+    const currentPost = visiblePosts.value[currentIndex.value]
+    if (currentPost.isAlbum && currentImageIndex.value < currentPost.images.length - 1) {
+      currentImageIndex.value++
+    } else if (currentIndex.value < visiblePosts.value.length - 1) {
+      currentIndex.value++
+      currentImageIndex.value = 0
+    }
   }
 
   const prevImage = () => {
-    currentIndex.value = (currentIndex.value - 1 + visiblePosts.value.length) % visiblePosts.value.length
+    const currentPost = visiblePosts.value[currentIndex.value]
+    if (currentPost.isAlbum && currentImageIndex.value > 0) {
+      currentImageIndex.value--
+    } else if (currentIndex.value > 0) {
+      currentIndex.value--
+      const prevPost = visiblePosts.value[currentIndex.value]
+      currentImageIndex.value = prevPost.isAlbum ? prevPost.images.length - 1 : 0
+    }
+  }
+
+  const skipPost = () => {
+    if (currentIndex.value < visiblePosts.value.length - 1) {
+      currentIndex.value++
+      currentImageIndex.value = 0
+    }
   }
 
   const goToLink = () => {
-    window.open(`https://reddit.com${visiblePosts.value[currentIndex.value].data.permalink}`, '_blank')
+    window.open(`https://reddit.com${visiblePosts.value[currentIndex.value].postData.permalink}`, '_blank')
   }
 
   const resetSearch = () => {
@@ -163,12 +212,21 @@
     isNSFWDialogOpen.value = false
   }
 
-  const currentPostUrl = computed(() => visiblePosts.value[currentIndex.value]?.data.url)
-  const hasPrevious = computed(() => currentIndex.value > 0)
-  const hasNext = computed(() => currentIndex.value < posts.value.length - 1)
+  const currentPostUrl = computed(() => {
+    const post = visiblePosts.value[currentIndex.value]
+    return post?.images[currentImageIndex.value]
+  })
+
+  const hasPrevious = computed(() => currentIndex.value > 0 || currentImageIndex.value > 0)
+  const hasNext = computed(() => {
+    if (visiblePosts.value.length === 0) return false
+    const lastPostIndex = visiblePosts.value.length - 1
+    const currentPost = visiblePosts.value[currentIndex.value]
+    return currentIndex.value < lastPostIndex || (currentPost && currentImageIndex.value < currentPost.images.length - 1)
+  })
 
   const visiblePosts = computed(() => {
-    return agreedToNSFW.value ? posts.value : posts.value.filter(post => !post.data.over_18)
+    return agreedToNSFW.value ? posts.value : posts.value.filter(post => !post.postData.over_18)
   })
 
   watch(bottomRef, newVal => {
