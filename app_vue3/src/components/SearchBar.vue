@@ -9,12 +9,12 @@
         @keyup.enter="search"
       >
         <template #append-inner>
-          <v-btn icon title="Reset" @click="reset">
+          <v-btn icon title="Reset" size="small" @click="reset" class="mx-1">
             <v-icon>mdi-restore</v-icon>
           </v-btn>
           <v-menu>
             <template #activator="{ props }">
-              <v-btn v-bind="props" icon title="Sort By">
+              <v-btn v-bind="props" icon title="Sort By" size="small" class="mx-1">
                 <v-icon>mdi-sort</v-icon>
               </v-btn>
             </template>
@@ -32,7 +32,7 @@
               </v-list-item>
             </v-list>
           </v-menu>
-          <v-btn color="secondary" icon title="Search" @click="search">
+          <v-btn color="secondary" icon title="Search" size="small" @click="search">
             <v-icon>mdi-send</v-icon>
           </v-btn>
         </template>
