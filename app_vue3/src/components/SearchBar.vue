@@ -15,7 +15,7 @@
           <v-menu>
             <template #activator="{ props }">
               <v-btn v-bind="props" icon title="Sort By">
-                <v-icon>mdi-wrench</v-icon>
+                <v-icon>mdi-sort</v-icon>
               </v-btn>
             </template>
             <v-list>
