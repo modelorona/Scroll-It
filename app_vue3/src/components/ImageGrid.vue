@@ -15,8 +15,13 @@
               :aspect-ratio="1"
               class="link-cursor"
               :src="getThumbnail(post)"
+              cover
               @click="$emit('selectImage', index)"
-            />
+            >
+              <template #error>
+                <v-img :src="logo" class="placeholder-image" />
+              </template>
+            </v-img>
           </div>
           <v-card-title>{{ post.postData.title }}</v-card-title>
           <v-card-actions>
@@ -45,6 +50,7 @@
 
 <script setup>
 import { ref, watch } from "vue";
+import logo from "@/assets/logo-white.png";
 
 const props = defineProps({
   posts: Array,
@@ -71,7 +77,7 @@ const getThumbnail = (post) => {
   if (post.mediaType === 'image') {
     return post.postData.url;
   }
-  // If all else fails, return empty so v-img can show a placeholder
+  // If all else fails, return empty to trigger the error slot
   return '';
 };
 
@@ -114,6 +120,7 @@ watch(
 }
 .image-container {
   position: relative;
+  background-color: #212121; /* Dark background for consistency */
 }
 .album-icon, .video-icon {
   position: absolute;
@@ -130,5 +137,12 @@ watch(
 .video-icon {
   top: 8px;
   left: 8px;
+}
+.placeholder-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  opacity: 0.3;
 }
 </style>
