@@ -13,7 +13,7 @@
             <v-img
               :aspect-ratio="1"
               class="link-cursor"
-              :src="post.isAlbum ? post.images[0] : post.postData.url"
+              :src="post.postData.thumbnail.startsWith('http') ? post.postData.thumbnail : (post.isAlbum ? post.images[0] : post.postData.url)"
               @click="$emit('selectImage', index)"
             />
           </div>
