@@ -1,4 +1,6 @@
 import {defineString} from "firebase-functions/params";
+import axios from "axios";
+import * as logger from "firebase-functions/logger";
 
 /**
  * Define environment parameters
@@ -17,6 +19,20 @@ const localhostSecretParam = defineString("LOCALHOST_SECRET", {
 const redditUsernameParam = defineString("REDDIT_USERNAME", {
   description: "Reddit username for User-Agent header",
 });
+
+const redditClientIdParam = defineString("REDDIT_CLIENT_ID", {
+  description: "Reddit OAuth client ID (from https://www.reddit.com/prefs/apps)",
+});
+
+const redditClientSecretParam = defineString("REDDIT_CLIENT_SECRET", {
+  description: "Reddit OAuth client secret",
+});
+
+/**
+ * OAuth token cache
+ */
+let cachedToken: string | null = null;
+let tokenExpiry: number = 0;
 
 /**
  * Get allowed origins from environment configuration
@@ -56,5 +72,58 @@ export function getRedditUsername(): string {
  */
 export function getRedditUserAgent(): string {
   const username = getRedditUsername();
-  return `web:scroll-it.xyz:v1.0.0 (by /u/${username})`;
+  return `web:imagoid_clone:v1.0.0 (by /u/${username})`;
+}
+
+/**
+ * Get Reddit OAuth credentials
+ */
+function getRedditCredentials() {
+  return {
+    clientId: redditClientIdParam.value(),
+    clientSecret: redditClientSecretParam.value(),
+  };
+}
+
+/**
+ * Get Reddit OAuth access token (cached, auto-refreshes)
+ * Uses application-only OAuth (no user login required)
+ */
+export async function getRedditAccessToken(): Promise<string> {
+  // Return cached token if still valid (with 5 min buffer)
+  if (cachedToken && Date.now() < tokenExpiry - 300000) {
+    return cachedToken;
+  }
+
+  try {
+    const {clientId, clientSecret} = getRedditCredentials();
+    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+
+    logger.info("Requesting new Reddit OAuth token");
+
+    const response = await axios.post(
+      "https://www.reddit.com/api/v1/access_token",
+      "grant_type=client_credentials",
+      {
+        headers: {
+          "Authorization": `Basic ${auth}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent": getRedditUserAgent(),
+        },
+        timeout: 10000,
+      }
+    );
+
+    const token = response.data.access_token;
+    cachedToken = token;
+    // Tokens typically last 1 hour (3600 seconds)
+    tokenExpiry = Date.now() + (response.data.expires_in * 1000);
+
+    logger.info(`Reddit OAuth token acquired, expires in ${response.data.expires_in}s`);
+
+    return token;
+  } catch (error) {
+    logger.error("Failed to get Reddit OAuth token:", error);
+    throw new Error("Failed to authenticate with Reddit API");
+  }
 }

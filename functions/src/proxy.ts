@@ -3,7 +3,7 @@ import * as logger from "firebase-functions/logger";
 import axios from "axios";
 import cors from "cors";
 import {rateLimit} from "./rateLimiter";
-import {getAllowedOrigins, getRedditUserAgent, getLocalhostSecret} from "./config";
+import {getAllowedOrigins, getLocalhostSecret, getRedditAccessToken, getRedditUserAgent} from "./config";
 
 // CORS handler with origin validation
 const corsHandler = cors({
@@ -104,13 +104,17 @@ export const redditProxy = onRequest({region: "europe-west4"}, (request, respons
           return;
         }
 
-        const url = `https://www.reddit.com/r/${subreddit}.json${after ? `?after=${after}` : ""}`;
+        // Use OAuth endpoint with authentication
+        const token = await getRedditAccessToken();
+        const url = `https://oauth.reddit.com/r/${subreddit}/${after ? `?after=${after}` : ""}`;
 
         try {
           const redditResponse = await axios.get(url, {
             headers: {
+              "Authorization": `Bearer ${token}`,
               "User-Agent": getRedditUserAgent(),
             },
+            timeout: 10000,
           });
           response.status(200).send(redditResponse.data);
         } catch (error) {
@@ -137,16 +141,19 @@ export const searchSubredditsProxy = onRequest({region: "europe-west4"}, (reques
           return;
         }
 
-        const url =
-        `https://www.reddit.com/api/search_reddit_names.json?query=${encodeURIComponent(query)}&include_over_18=true`;
+        // Use OAuth endpoint with authentication
+        const token = await getRedditAccessToken();
+        const url = `https://oauth.reddit.com/api/search_reddit_names?query=${encodeURIComponent(query)}&include_over_18=true`;
 
         logger.info(`Proxying subreddit search request to: ${url}`);
 
         try {
           const redditResponse = await axios.get(url, {
             headers: {
+              "Authorization": `Bearer ${token}`,
               "User-Agent": getRedditUserAgent(),
             },
+            timeout: 10000,
           });
           response.status(200).send(redditResponse.data);
         } catch (error) {
