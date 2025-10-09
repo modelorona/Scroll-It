@@ -2,24 +2,27 @@ import { defineStore } from 'pinia';
 import { useSettingsStore } from './settings';
 
 export const useGalleryStore = defineStore('gallery', {
-  state: () => ({
-    posts: [],
-    subreddit: '',
-    sortOption: 'hot',
-    after: null,
-    fetchingImages: false,
-    isNSFWDialogOpen: false,
-    agreedToNSFW: sessionStorage.getItem('agreedToNSFW') === 'true',
-    currentIndex: 0,
-    currentImageIndex: 0,
-    isPlaying: false,
-    imageOverlay: false,
-    infoBannerVisible: true,
-    error: null,
-    slideshowInterval: null,
-  }),
+  state: () => {
+    const settingsStore = useSettingsStore();
+    return {
+      posts: [],
+      subreddit: settingsStore.lastVisitedSubreddit,
+      sortOption: settingsStore.sortOption,
+      after: null,
+      fetchingImages: false,
+      isNSFWDialogOpen: false,
+      agreedToNSFW: settingsStore.agreedToNSFW,
+      currentIndex: 0,
+      currentImageIndex: 0,
+      isPlaying: false,
+      imageOverlay: false,
+      infoBannerVisible: true,
+      error: null,
+      slideshowInterval: null,
+    };
+  },
   getters: {
-    slideshowIntervalTimeMs: (state) => {
+    slideshowIntervalTimeMs: () => {
       const settingsStore = useSettingsStore();
       return settingsStore.slideshowInterval * 1000;
     },
@@ -42,6 +45,10 @@ export const useGalleryStore = defineStore('gallery', {
   actions: {
     async fetchRedditImages(reset = false) {
       if (!this.subreddit) return;
+
+      const settingsStore = useSettingsStore();
+      settingsStore.setLastVisitedSubreddit(this.subreddit);
+      settingsStore.setSortOption(this.sortOption);
 
       if (reset) {
         this.posts = [];
@@ -196,13 +203,31 @@ export const useGalleryStore = defineStore('gallery', {
     },
     acceptNSFW() {
       this.isNSFWDialogOpen = false;
-      sessionStorage.setItem('agreedToNSFW', 'true');
+      const settingsStore = useSettingsStore();
+      settingsStore.setAgreedToNSFW(true);
       this.agreedToNSFW = true;
     },
     declineNSFW() {
-      sessionStorage.setItem('agreedToNSFW', 'false');
+      const settingsStore = useSettingsStore();
+      settingsStore.setAgreedToNSFW(false);
       this.agreedToNSFW = false;
       this.isNSFWDialogOpen = false;
     },
+    async searchSubreddits(query) {
+      if (!query) {
+        return [];
+      }
+      try {
+        const response = await fetch(`https://www.reddit.com/api/search_reddit_names.json?query=${encodeURIComponent(query)}&include_over_18=true`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data.names || [];
+      } catch (error) {
+        console.error('Error fetching subreddit suggestions:', error);
+        return [];
+      }
+    }
   },
 });

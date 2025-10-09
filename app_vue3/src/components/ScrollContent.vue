@@ -1,21 +1,29 @@
 <template>
-  <v-container align-content="start" fluid class="px-md-4">
-
+  <v-container
+    fluid
+    class="px-md-4 align-content"
+  >
     <SearchBar
-      v-model:sortOption="galleryStore.sortOption"
+      v-model:sort-option="galleryStore.sortOption"
       v-model:subreddit="galleryStore.subreddit"
       @reset="galleryStore.resetSearch"
       @search="galleryStore.fetchRedditImages(true)"
     />
 
     <NSFWAlert
-      v-model:isOpen="galleryStore.isNSFWDialogOpen"
+      v-model:is-open="galleryStore.isNSFWDialogOpen"
       @accept="galleryStore.acceptNSFW"
       @decline="galleryStore.declineNSFW"
     />
 
-    <v-container v-if="galleryStore.infoBannerVisible && galleryStore.visiblePosts.length > 0 && !galleryStore.isNSFWDialogOpen" fluid>
-      <v-row align="center" justify="center">
+    <v-container
+      v-if="galleryStore.infoBannerVisible && galleryStore.visiblePosts.length > 0 && !galleryStore.isNSFWDialogOpen"
+      fluid
+    >
+      <v-row
+        align="center"
+        justify="center"
+      >
         <v-banner
           icon="mdi-information"
           lines="one"
@@ -24,20 +32,37 @@
           text="Click on an image to enlarge it"
         >
           <template #actions>
-            <v-btn icon="mdi-close" @click="galleryStore.infoBannerVisible = false" />
+            <v-btn
+              icon="mdi-close"
+              @click="galleryStore.infoBannerVisible = false"
+            />
           </template>
         </v-banner>
       </v-row>
     </v-container>
 
-    <v-container v-if="galleryStore.visiblePosts.length > 0 && !galleryStore.isNSFWDialogOpen" fluid>
-      <v-row align="center" justify="center">
-        <v-btn @click="galleryStore.startSlideshow(0)">Start slideshow</v-btn>
+    <v-container
+      v-if="galleryStore.visiblePosts.length > 0 && !galleryStore.isNSFWDialogOpen"
+      fluid
+    >
+      <v-row
+        align="center"
+        justify="center"
+      >
+        <v-btn @click="galleryStore.startSlideshow(0)">
+          Start slideshow
+        </v-btn>
       </v-row>
     </v-container>
 
-    <v-container v-if="galleryStore.error" fluid>
-      <v-alert type="error" :text="galleryStore.error" />
+    <v-container
+      v-if="galleryStore.error"
+      fluid
+    >
+      <v-alert
+        type="error"
+        :text="galleryStore.error"
+      />
     </v-container>
 
     <ImageGridSkeleton v-if="galleryStore.fetchingImages && galleryStore.posts.length === 0" />

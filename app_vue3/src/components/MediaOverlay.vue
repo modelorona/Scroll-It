@@ -41,7 +41,7 @@
             @load="mediaLoading = false"
           />
           <video
-            v-else-if="currentPost.mediaType === 'video'"
+            v-else-if="currentPost.mediaType === 'video' || currentPost.mediaType === 'gif'"
             :key="currentPost.images[0]"
             class="full-size-media"
             autoplay
@@ -57,10 +57,13 @@
             >
             Your browser does not support the video tag.
           </video>
-          <div
-            v-else-if="currentPost.mediaType === 'embed'"
-            class="embed-container"
-            v-html="currentPost.images[0]"
+          <iframe
+            v-else-if="currentPost.mediaType === 'iframe'"
+            :src="currentPost.images[0]"
+            class="full-size-media"
+            frameborder="0"
+            allow="autoplay; fullscreen"
+            allowfullscreen
           />
         </div>
       </v-card-text>

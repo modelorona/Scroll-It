@@ -4,10 +4,14 @@
       cols="12"
       md="12"
     >
-      <v-text-field
+      <v-autocomplete
         v-model="subreddit"
+        v-model:search="searchQuery"
+        v-model:menu="isMenuOpen"
+        :items="subredditItems"
+        :loading="loading"
         clearable
-        hint="Press enter to search"
+        hint="Start typing to search for a subreddit"
         label="Enter Subreddit Name"
         @keyup.enter="search"
       >
@@ -59,53 +63,87 @@
             <v-icon>mdi-send</v-icon>
           </v-btn>
         </template>
-      </v-text-field>
+      </v-autocomplete>
     </v-col>
   </v-row>
 </template>
 
-  <script setup>
-  import { ref, watch } from 'vue'
+<script setup>
+import { ref, watch } from 'vue';
+import { useGalleryStore } from '@/stores/gallery';
+import { debounce } from 'lodash';
 
-  const props = defineProps({
-    subreddit: {
-      type: String,
-      default: '',
-    },
-    sortOption: {
-      type: String,
-      default: 'hot',
-    },
-  })
+const props = defineProps({
+  subreddit: {
+    type: String,
+    default: '',
+  },
+  sortOption: {
+    type: String,
+    default: 'hot',
+  },
+});
 
-  const emit = defineEmits(['update:subreddit', 'update:sortOption', 'search', 'reset'])
+const emit = defineEmits(['update:subreddit', 'update:sortOption', 'search', 'reset']);
 
-  const subreddit = ref(props.subreddit)
-  const sortOption = ref(props.sortOption)
+const galleryStore = useGalleryStore();
 
-  const sortOptions = ['hot', 'new', 'top']
+const subreddit = ref(props.subreddit);
+const searchQuery = ref(props.subreddit);
+const sortOption = ref(props.sortOption);
+const subredditItems = ref([]);
+const loading = ref(false);
+const isMenuOpen = ref(false);
 
-  watch(() => props.subreddit, newValue => {
-    subreddit.value = newValue
-  })
+const sortOptions = ['hot', 'new', 'top'];
 
-  watch(() => props.sortOption, newValue => {
-    sortOption.value = newValue
-  })
-
-  const search = () => {
-    emit('update:subreddit', subreddit.value)
-    emit('search')
+// When a subreddit is selected from the list, update the search query to match
+watch(() => subreddit.value, (newValue) => {
+  if (newValue) {
+    searchQuery.value = newValue;
   }
+});
 
-  const reset = () => {
-    subreddit.value = ''
-    emit('update:subreddit', '')
-    emit('reset')
-  }
+watch(() => props.sortOption, (newValue) => {
+  sortOption.value = newValue;
+});
 
-  const updateSort = sort => {
-    sortOption.value = sort
-    emit('update:sortOption', sort)
+const search = () => {
+  // Use the typed query for the search, not the v-model value
+  emit('update:subreddit', searchQuery.value);
+  emit('search');
+  isMenuOpen.value = false;
+};
+
+const reset = () => {
+  subreddit.value = '';
+  searchQuery.value = '';
+  emit('update:subreddit', '');
+  emit('reset');
+};
+
+const updateSort = (sort) => {
+  sortOption.value = sort;
+  emit('update:sortOption', sort);
+};
+
+const fetchSubredditSuggestions = async (query) => {
+  if (!query || query.length < 2) {
+    subredditItems.value = [];
+    return;
   }
-  </script>
+  loading.value = true;
+  subredditItems.value = await galleryStore.searchSubreddits(query);
+  isMenuOpen.value = subredditItems.value.length > 0;
+  loading.value = false;
+};
+
+const debouncedSearch = debounce(fetchSubredditSuggestions, 300);
+
+// Watch the search query to fetch suggestions
+watch(searchQuery, (newValue) => {
+  if (newValue !== subreddit.value) {
+    debouncedSearch(newValue);
+  }
+});
+</script>

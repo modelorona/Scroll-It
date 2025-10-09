@@ -1,8 +1,16 @@
 <template>
   <v-container fluid>
-    <div v-if="posts.length > 0" v-bind="containerProps" class="virtual-scroll-container" @scroll.passive="handleScroll">
+    <div
+      v-if="posts.length > 0"
+      v-bind="containerProps"
+      class="virtual-scroll-container"
+      @scroll.passive="handleScroll"
+    >
       <div v-bind="wrapperProps">
-        <v-row v-for="{ data: postRow } in list" :key="postRow[0] ? postRow[0].postData.id : ''">
+        <v-row
+          v-for="{ data: postRow } in list"
+          :key="postRow[0] ? postRow[0].postData.id : ''"
+        >
           <v-col
             v-for="post in postRow"
             :key="post.postData.id"
@@ -11,8 +19,18 @@
           >
             <v-card v-if="!post.postData.over_18 || agreedToNSFW">
               <div class="image-container">
-                <v-icon v-if="post.mediaType === 'album'" class="album-icon">mdi-image-multiple</v-icon>
-                <v-icon v-if="post.mediaType === 'video' || post.mediaType === 'embed'" class="video-icon">mdi-play-circle</v-icon>
+                <v-icon
+                  v-if="post.mediaType === 'album'"
+                  class="album-icon"
+                >
+                  mdi-image-multiple
+                </v-icon>
+                <v-icon
+                  v-if="post.mediaType === 'video' || post.mediaType === 'embed'"
+                  class="video-icon"
+                >
+                  mdi-play-circle
+                </v-icon>
                 <v-img
                   :aspect-ratio="1"
                   class="link-cursor"
@@ -21,7 +39,10 @@
                   @click="$emit('selectImage', post.originalIndex)"
                 >
                   <template #error>
-                    <v-img :src="logo" class="placeholder-image" />
+                    <v-img
+                      :src="logo"
+                      class="placeholder-image"
+                    />
                   </template>
                 </v-img>
               </div>
@@ -31,7 +52,7 @@
                   color="primary"
                   :href="`https://reddit.com${post.postData.permalink}`"
                   target="_blank"
-                  text
+                  variant="text"
                 >
                   View Post On Reddit
                 </v-btn>
@@ -53,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, computed } from "vue";
 import { useVirtualList } from "@vueuse/core";
 import logo from "@/assets/logo-white.png";
 

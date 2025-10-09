@@ -6,17 +6,17 @@
     <v-card>
       <v-card-title>Settings</v-card-title>
       <v-card-text>
-                        <v-slider
-                          v-model="settingsStore.slideshowInterval"
-                          label="Slideshow Interval (seconds)"
-                          min="1"
-                          max="30"
-                          step="1"
-                          thumb-label
-                          hint="The time between slides in the slideshow."
-                          persistent-hint
-                          @update:model-value="settingsStore.setSlideshowInterval"
-                        />        <div class="text-center">
+        <v-slider
+          v-model="settingsStore.slideshowInterval"
+          label="Slideshow Interval (seconds)"
+          min="1"
+          max="30"
+          step="1"
+          thumb-label
+          hint="The time between slides in the slideshow."
+          persistent-hint
+          @update:model-value="settingsStore.setSlideshowInterval"
+        />        <div class="text-center">
           {{ settingsStore.slideshowInterval }} seconds
         </div>
       </v-card-text>
