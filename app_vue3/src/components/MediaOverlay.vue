@@ -43,27 +43,22 @@
           <video
             v-else-if="currentPost.mediaType === 'video' || currentPost.mediaType === 'gif'"
             :key="currentPost.images[0]"
+            :src="currentPost.images[0]"
             class="full-size-media"
             autoplay
             loop
             muted
             controls
+            preload="metadata"
             @loadeddata="mediaLoading = false"
             @ended="$emit('mediaEnded')"
           >
-            <source
-              :src="currentPost.images[0]"
-              type="video/mp4"
-            >
             Your browser does not support the video tag.
           </video>
-          <iframe
-            v-else-if="currentPost.mediaType === 'iframe'"
-            :src="currentPost.images[0]"
-            class="full-size-media"
-            frameborder="0"
-            allow="autoplay; fullscreen"
-            allowfullscreen
+          <div
+            v-else-if="currentPost.mediaType === 'embed'"
+            class="embed-container"
+            v-html="currentPost.images[0]"
           />
         </div>
       </v-card-text>
@@ -143,11 +138,18 @@
   const mediaLoading = ref(true)
   const showTooltip = ref(false)
 
-  watch(() => props.modelValue, newValue => {
+  watch(() => props.modelValue, async (newValue) => {
     dialog.value = newValue
     if (newValue) {
       mediaLoading.value = true
       showShortcutTooltip()
+      // Handle embeds when dialog opens
+      if (props.currentPost && props.currentPost.mediaType === 'embed') {
+        await nextTick()
+        setTimeout(() => {
+          mediaLoading.value = false
+        }, 1000)
+      }
     }
   })
 

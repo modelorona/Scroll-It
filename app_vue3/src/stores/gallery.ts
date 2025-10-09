@@ -73,7 +73,7 @@ export const useGalleryStore = defineStore('gallery', {
     const settingsStore = useSettingsStore();
     return {
       posts: [],
-      subreddit: settingsStore.lastVisitedSubreddit,
+      subreddit: '',
       sortOption: settingsStore.sortOption,
       after: null,
       fetchingImages: false,
@@ -117,7 +117,6 @@ export const useGalleryStore = defineStore('gallery', {
       if (!this.subreddit) return;
 
       const settingsStore = useSettingsStore();
-      settingsStore.setLastVisitedSubreddit(this.subreddit);
       settingsStore.setSortOption(this.sortOption);
 
       if (reset) {

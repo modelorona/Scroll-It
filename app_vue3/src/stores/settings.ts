@@ -4,7 +4,6 @@ import { defineStore } from 'pinia';
 export const useSettingsStore = defineStore('settings', {
   state: () => ({
     slideshowInterval: parseInt(localStorage.getItem('slideshowInterval') || '5'),
-    lastVisitedSubreddit: localStorage.getItem('lastVisitedSubreddit') || '',
     sortOption: localStorage.getItem('sortOption') || 'hot',
     agreedToNSFW: localStorage.getItem('agreedToNSFW') === 'true',
     useProxy: sessionStorage.getItem('useProxy') === 'true',
@@ -13,10 +12,6 @@ export const useSettingsStore = defineStore('settings', {
     setSlideshowInterval(interval: number) {
       this.slideshowInterval = interval;
       localStorage.setItem('slideshowInterval', interval.toString());
-    },
-    setLastVisitedSubreddit(subreddit: string) {
-      this.lastVisitedSubreddit = subreddit;
-      localStorage.setItem('lastVisitedSubreddit', subreddit);
     },
     setSortOption(option: string) {
       this.sortOption = option;

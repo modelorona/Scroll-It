@@ -97,9 +97,15 @@ const isMenuOpen = ref(false);
 
 const sortOptions = ['hot', 'new', 'top'];
 
+// Sync local state with props when they change
+watch(() => props.subreddit, (newValue) => {
+  subreddit.value = newValue;
+  searchQuery.value = newValue;
+});
+
 // When a subreddit is selected from the list, update the search query to match
 watch(() => subreddit.value, (newValue) => {
-  if (newValue) {
+  if (newValue && newValue !== searchQuery.value) {
     searchQuery.value = newValue;
   }
 });
