@@ -1,8 +1,41 @@
 import { defineStore } from 'pinia';
 import { useSettingsStore } from './settings';
 
+const PROXY_URL = 'http://127.0.0.1:5001/scroll-it-420/us-central1/redditProxy'; // Replace with your proxy URL
+const SEARCH_PROXY_URL = 'http://127.0.0.1:5001/scroll-it-420/us-central1/searchSubredditsProxy'; // Replace with your proxy URL
+
+interface PostData {
+  over_18: boolean;
+  permalink: string;
+  [key: string]: any;
+}
+
+interface Post {
+  postData: PostData;
+  images: string[];
+  isAlbum: boolean;
+  mediaType: 'album' | 'image' | 'video' | 'embed';
+}
+
+interface GalleryState {
+  posts: Post[];
+  subreddit: string;
+  sortOption: string;
+  after: string | null;
+  fetchingImages: boolean;
+  isNSFWDialogOpen: boolean;
+  agreedToNSFW: boolean;
+  currentIndex: number;
+  currentImageIndex: number;
+  isPlaying: boolean;
+  imageOverlay: boolean;
+  infoBannerVisible: boolean;
+  error: string | null;
+  slideshowInterval: number | null;
+}
+
 export const useGalleryStore = defineStore('gallery', {
-  state: () => {
+  state: (): GalleryState => {
     const settingsStore = useSettingsStore();
     return {
       posts: [],
@@ -29,17 +62,17 @@ export const useGalleryStore = defineStore('gallery', {
     visiblePosts: (state) => {
       return state.agreedToNSFW ? state.posts : state.posts.filter(post => !post.postData.over_18);
     },
-    currentPost: (state) => {
-      return state.visiblePosts[state.currentIndex];
+    currentPost(): Post | undefined {
+      return this.visiblePosts[this.currentIndex];
     },
     hasPrevious: (state) => {
       return state.currentIndex > 0 || state.currentImageIndex > 0;
     },
-    hasNext: (state) => {
-      if (state.visiblePosts.length === 0) return false;
-      const lastPostIndex = state.visiblePosts.length - 1;
-      const post = state.visiblePosts[state.currentIndex];
-      return state.currentIndex < lastPostIndex || (post && state.currentImageIndex < post.images.length - 1);
+    hasNext(): boolean {
+      if (this.visiblePosts.length === 0) return false;
+      const lastPostIndex = this.visiblePosts.length - 1;
+      const post = this.visiblePosts[this.currentIndex];
+      return this.currentIndex < lastPostIndex || (post && this.currentImageIndex < post.images.length - 1);
     },
   },
   actions: {
@@ -59,20 +92,33 @@ export const useGalleryStore = defineStore('gallery', {
       this.fetchingImages = true;
       this.error = null;
       try {
-        const url = `https://www.reddit.com/r/${this.subreddit}/${this.sortOption}.json?limit=50${this.after ? `&after=${this.after}` : ''}`;
+        let url;
+        if (settingsStore.useProxy) {
+          const params = new URLSearchParams({
+            subreddit: this.subreddit,
+            sort: this.sortOption,
+            limit: '50',
+          });
+          if (this.after) {
+            params.append('after', this.after);
+          }
+          url = `${PROXY_URL}?${params.toString()}`;
+        } else {
+          url = `https://www.reddit.com/r/${this.subreddit}/${this.sortOption}.json?limit=50${this.after ? `&after=${this.after}` : ''}`;
+        }
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`Subreddit r/${this.subreddit} not found.`);
         }
         const data = await response.json();
         const processedPosts = data.data.children
-          .map(post => {
+          .map((post: any) => {
             const { data } = post
             // Album / Gallery
             if (data.is_gallery) {
               const images = Object.keys(data.media_metadata).map(id => {
                 const media = data.media_metadata[id]
-                const bestQuality = media.p.find(q => q.x > 1000) || media.s
+                const bestQuality = media.p.find((q: any) => q.x > 1000) || media.s
                 return bestQuality.u.replace(/&amp;/g, '&')
               })
               return { postData: data, images, isAlbum: true, mediaType: 'album' }
@@ -113,31 +159,36 @@ export const useGalleryStore = defineStore('gallery', {
         if (!this.agreedToNSFW && this.posts.some(p => p.postData.over_18)) {
           this.isNSFWDialogOpen = true;
         }
-      } catch (error) {
+      } catch (error: any) {
         this.error = error.message;
         console.error('Error fetching data from Reddit:', error);
       } finally {
         this.fetchingImages = false;
       }
     },
-    startSlideshow(startingIndex = this.currentIndex) {
+    startSlideshow(startingIndex?: number) {
+      if (startingIndex === undefined) {
+        startingIndex = this.currentIndex;
+      }
       if (this.isPlaying) return;
       this.isPlaying = true;
       this.setOverlayImage(startingIndex);
 
       const post = this.visiblePosts[this.currentIndex];
       if (post.mediaType !== 'video') {
-        this.slideshowInterval = setInterval(this.slideshowNext, this.slideshowIntervalTimeMs);
+        this.slideshowInterval = window.setInterval(this.slideshowNext, this.slideshowIntervalTimeMs);
       }
     },
-    setOverlayImage(index) {
+    setOverlayImage(index: number) {
       this.imageOverlay = true;
       this.currentIndex = index;
       this.currentImageIndex = 0;
     },
     stopSlideshow() {
       if (!this.isPlaying) return;
-      clearInterval(this.slideshowInterval);
+      if (this.slideshowInterval !== null) {
+        window.clearInterval(this.slideshowInterval);
+      }
       this.slideshowInterval = null;
       this.isPlaying = false;
     },
@@ -170,10 +221,12 @@ export const useGalleryStore = defineStore('gallery', {
       }
 
       if (this.isPlaying) {
-        clearInterval(this.slideshowInterval);
+        if (this.slideshowInterval !== null) {
+          window.clearInterval(this.slideshowInterval);
+        }
         const nextPost = this.visiblePosts[this.currentIndex];
         if (nextPost.mediaType !== 'video') {
-          this.slideshowInterval = setInterval(this.slideshowNext, this.slideshowIntervalTimeMs);
+          this.slideshowInterval = window.setInterval(this.slideshowNext, this.slideshowIntervalTimeMs);
         }
       }
     },
@@ -199,7 +252,7 @@ export const useGalleryStore = defineStore('gallery', {
     resetSearch() {
       this.posts = [];
       this.subreddit = '';
-      this.after = '';
+      this.after = null;
     },
     acceptNSFW() {
       this.isNSFWDialogOpen = false;
@@ -213,12 +266,19 @@ export const useGalleryStore = defineStore('gallery', {
       this.agreedToNSFW = false;
       this.isNSFWDialogOpen = false;
     },
-    async searchSubreddits(query) {
+    async searchSubreddits(query: string) {
       if (!query) {
         return [];
       }
       try {
-        const response = await fetch(`https://www.reddit.com/api/search_reddit_names.json?query=${encodeURIComponent(query)}&include_over_18=true`);
+        const settingsStore = useSettingsStore();
+        let url;
+        if (settingsStore.useProxy) {
+          url = `${SEARCH_PROXY_URL}?query=${encodeURIComponent(query)}`;
+        } else {
+          url = `https://www.reddit.com/api/search_reddit_names.json?query=${encodeURIComponent(query)}&include_over_18=true`;
+        }
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
