@@ -14,6 +14,7 @@ declare module 'vue' {
     Main: typeof import('./components/Main.vue')['default']
     MediaOverlay: typeof import('./components/MediaOverlay.vue')['default']
     NSFWAlert: typeof import('./components/NSFWAlert.vue')['default']
+    ProxyPromptDialog: typeof import('./components/ProxyPromptDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScrollContent: typeof import('./components/ScrollContent.vue')['default']

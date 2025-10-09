@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Rate limit collection - only accessible by Cloud Functions
+    match /rateLimits/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Add your other collection rules here
+    // Example:
+    // match /users/{userId} {
+    //   allow read, write: if request.auth != null && request.auth.uid == userId;
+    // }
+  }
+}

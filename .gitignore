@@ -2,3 +2,5 @@
 app/dist/*
 app/node_modules/*
 app/.env
+app_vue3/.env.local
+functions/.env

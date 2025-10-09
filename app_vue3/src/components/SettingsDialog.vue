@@ -19,6 +19,13 @@
         />        <div class="text-center">
           {{ settingsStore.slideshowInterval }} seconds
         </div>
+        <v-switch
+          v-model="settingsStore.useProxy"
+          label="Use Proxy for Requests"
+          hint="Route requests through a Firebase function."
+          persistent-hint
+          @update:model-value="settingsStore.setUseProxy"
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />

@@ -7,7 +7,7 @@ export const useSettingsStore = defineStore('settings', {
     lastVisitedSubreddit: localStorage.getItem('lastVisitedSubreddit') || '',
     sortOption: localStorage.getItem('sortOption') || 'hot',
     agreedToNSFW: localStorage.getItem('agreedToNSFW') === 'true',
-    useProxy: localStorage.getItem('useProxy') === 'true',
+    useProxy: sessionStorage.getItem('useProxy') === 'true',
   }),
   actions: {
     setSlideshowInterval(interval: number) {
@@ -28,7 +28,7 @@ export const useSettingsStore = defineStore('settings', {
     },
     setUseProxy(value: boolean) {
       this.useProxy = value;
-      localStorage.setItem('useProxy', value.toString());
+      sessionStorage.setItem('useProxy', value.toString());
     },
   },
 });
