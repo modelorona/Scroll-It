@@ -7,6 +7,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Monthly usage limits - only accessible by Cloud Functions
+    match /limits/{document=**} {
+      allow read, write: if false;
+    }
+
     // Add your other collection rules here
     // Example:
     // match /users/{userId} {

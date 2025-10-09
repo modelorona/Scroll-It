@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 import { useSettingsStore } from './settings';
 
-const PROXY_URL = 'https://redditproxy-gonwhgqvua-ez.a.run.app';
-const SEARCH_PROXY_URL = 'https://searchsubredditsproxy-gonwhgqvua-ez.a.run.app';
-const PROXY_STATUS_URL = 'https://proxystatus-gonwhgqvua-ez.a.run.app';
+const PROXY_URL = 'https://europe-west4-scrollit-f3849.cloudfunctions.net/redditProxy';
+const SEARCH_PROXY_URL = 'https://europe-west4-scrollit-f3849.cloudfunctions.net/searchSubredditsProxy';
+const PROXY_STATUS_URL = 'https://europe-west4-scrollit-f3849.cloudfunctions.net/proxyStatus';
 
 // Set this to your localhost secret for local testing (optional)
 // In production, leave as empty string
@@ -20,7 +20,7 @@ function getFetchOptions(url: string): RequestInit {
   // 1. We're on localhost
   // 2. Have a secret configured
   // 3. Making a request to our proxy endpoints (not Reddit directly)
-  const isProxyRequest = url.includes('gonwhgqvua-ez.a.run.app');
+  const isProxyRequest = url.includes('scrollit-f3849.cloudfunctions.net');
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   if (LOCALHOST_SECRET && isLocalhost && isProxyRequest) {
@@ -134,14 +134,14 @@ export const useGalleryStore = defineStore('gallery', {
           const params = new URLSearchParams({
             subreddit: this.subreddit,
             sort: this.sortOption,
-            limit: '50',
+            limit: '100',
           });
           if (this.after) {
             params.append('after', this.after);
           }
           url = `${PROXY_URL}?${params.toString()}`;
         } else {
-          url = `https://www.reddit.com/r/${this.subreddit}/${this.sortOption}.json?limit=50${this.after ? `&after=${this.after}` : ''}`;
+          url = `https://www.reddit.com/r/${this.subreddit}/${this.sortOption}.json?limit=100${this.after ? `&after=${this.after}` : ''}`;
         }
         const response = await fetch(url, getFetchOptions(url));
         if (!response.ok) {
@@ -299,7 +299,7 @@ export const useGalleryStore = defineStore('gallery', {
       }
     },
     nextImage() {
-      if (this.currentIndex >= this.visiblePosts.length - 4) {
+      if (this.currentIndex >= this.visiblePosts.length - 10) {
         this.fetchRedditImages();
       }
       const currentPost = this.visiblePosts[this.currentIndex];

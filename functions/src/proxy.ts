@@ -4,6 +4,7 @@ import axios from "axios";
 import cors from "cors";
 import {rateLimit} from "./rateLimiter";
 import {getAllowedOrigins, getLocalhostSecret, getRedditAccessToken, getRedditUserAgent} from "./config";
+import {checkMonthlyLimit} from "./monthlyLimit";
 
 // CORS handler with origin validation
 const corsHandler = cors({
@@ -80,27 +81,58 @@ function validateLocalhostSecret(
   next();
 }
 
-// Rate limit: 30 requests per minute per IP
+// Rate limit: 5 requests per minute per IP
 const redditRateLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 30,
+  maxRequests: 5,
 });
 
-// Rate limit: 60 requests per minute per IP for search
+// Rate limit: 10 requests per minute per IP for search
 const searchRateLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 60,
+  maxRequests: 10,
 });
 
 export const redditProxy = onRequest({region: "europe-west4"}, (request, response) => {
   corsHandler(request, response, () => {
     validateLocalhostSecret(request, response, () => {
       redditRateLimiter(request, response, async () => {
+        // Check monthly invocation limit
+        const withinLimit = await checkMonthlyLimit();
+        if (!withinLimit) {
+          response.status(429).json({
+            error: "Monthly Limit Exceeded",
+            message: "Service has reached its monthly usage limit. Please try again next month.",
+          });
+          return;
+        }
+
         const subreddit = request.query.subreddit as string;
         const after = request.query.after as string;
 
         if (!subreddit) {
-          response.status(400).send("Subreddit is required");
+          response.status(400).json({
+            error: "Bad Request",
+            message: "Subreddit is required",
+          });
+          return;
+        }
+
+        // Validate subreddit name format (alphanumeric, underscores, hyphens only, 3-21 chars)
+        if (!/^[a-zA-Z0-9_-]{3,21}$/.test(subreddit)) {
+          response.status(400).json({
+            error: "Bad Request",
+            message: "Invalid subreddit name format",
+          });
+          return;
+        }
+
+        // Validate after token if provided (Reddit pagination tokens format: t[0-9]_[alphanumeric])
+        if (after && !/^t[0-9]_[a-zA-Z0-9_-]+$/.test(after)) {
+          response.status(400).json({
+            error: "Bad Request",
+            message: "Invalid pagination token format",
+          });
           return;
         }
 
@@ -134,6 +166,16 @@ export const searchSubredditsProxy = onRequest({region: "europe-west4"}, (reques
   corsHandler(request, response, () => {
     validateLocalhostSecret(request, response, () => {
       searchRateLimiter(request, response, async () => {
+        // Check monthly invocation limit
+        const withinLimit = await checkMonthlyLimit();
+        if (!withinLimit) {
+          response.status(429).json({
+            error: "Monthly Limit Exceeded",
+            message: "Service has reached its monthly usage limit. Please try again next month.",
+          });
+          return;
+        }
+
         const query = request.query.query as string;
 
         if (!query) {

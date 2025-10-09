@@ -126,31 +126,30 @@ export const proxyStatus = onRequest({region: "europe-west4"}, async (request, r
         status.status = "unavailable";
       }
 
-      // Check Reddit API accessibility
+      // Check Reddit API accessibility via OAuth
       try {
         const axios = await import("axios");
-        const {getRedditUserAgent} = await import("./config.js");
+        const {getRedditAccessToken, getRedditUserAgent} = await import("./config.js");
+        const token = await getRedditAccessToken();
         const redditResponse = await axios.default.get(
-          "https://www.reddit.com/r/test.json?limit=1",
+          "https://oauth.reddit.com/r/test?limit=1",
           {
             timeout: 5000,
-            headers: {"User-Agent": getRedditUserAgent()},
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "User-Agent": getRedditUserAgent(),
+            },
           }
         );
         status.services.reddit = redditResponse.status === 200 ?
           "available" : "unavailable";
       } catch (error: any) {
-        // Reddit may block health checks from cloud IPs (403)
-        // This doesn't mean the proxy won't work for end users
-        if (error.response?.status === 403) {
-          logger.info("Reddit health check blocked (403) - this is expected from cloud IPs");
-          status.services.reddit = "unknown";
-        } else {
-          logger.error("Reddit health check failed:", error);
-          status.services.reddit = "unavailable";
-        }
-        // Reddit being blocked/down is degraded, not fully unavailable
-        // (users can still use direct access, and proxy may work for them)
+        logger.error("Reddit health check failed:", {
+          status: error.response?.status,
+          message: error.message,
+        });
+        status.services.reddit = "unavailable";
+        // Reddit being down is degraded, not fully unavailable
         if (status.status === "operational") {
           status.status = "degraded";
         }

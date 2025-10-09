@@ -33,6 +33,7 @@ const redditClientSecretParam = defineString("REDDIT_CLIENT_SECRET", {
  */
 let cachedToken: string | null = null;
 let tokenExpiry: number = 0;
+let tokenRefreshInProgress = false;
 
 /**
  * Get allowed origins from environment configuration
@@ -95,6 +96,17 @@ export async function getRedditAccessToken(): Promise<string> {
     return cachedToken;
   }
 
+  // Wait if refresh is already in progress
+  while (tokenRefreshInProgress) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Check again after waiting - another request may have refreshed it
+    if (cachedToken && Date.now() < tokenExpiry - 300000) {
+      return cachedToken;
+    }
+  }
+
+  tokenRefreshInProgress = true;
+
   try {
     const {clientId, clientSecret} = getRedditCredentials();
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
@@ -123,7 +135,18 @@ export async function getRedditAccessToken(): Promise<string> {
 
     return token;
   } catch (error) {
-    logger.error("Failed to get Reddit OAuth token:", error);
+    // Log error safely without exposing credentials
+    if (axios.isAxiosError(error)) {
+      logger.error("Failed to get Reddit OAuth token", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.message,
+      });
+    } else {
+      logger.error("Failed to get Reddit OAuth token: Unknown error");
+    }
     throw new Error("Failed to authenticate with Reddit API");
+  } finally {
+    tokenRefreshInProgress = false;
   }
 }
