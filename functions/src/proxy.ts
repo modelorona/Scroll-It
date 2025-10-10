@@ -5,6 +5,7 @@ import cors from "cors";
 import {rateLimit} from "./rateLimiter";
 import {getAllowedOrigins, getLocalhostSecret, getRedditAccessToken, getRedditUserAgent} from "./config";
 import {checkMonthlyLimit} from "./monthlyLimit";
+import {initializeGeoIP, getCountryFromIP, trackAnonymousRequest} from "./anonymousAnalytics";
 
 // CORS handler with origin validation
 const corsHandler = cors({
@@ -93,6 +94,9 @@ const searchRateLimiter = rateLimit({
   maxRequests: 10,
 });
 
+// Initialize GeoIP database (lazy-loaded on first request)
+let geoIPLookup: any = null;
+
 export const redditProxy = onRequest({region: "europe-west4"}, (request, response) => {
   corsHandler(request, response, () => {
     validateLocalhostSecret(request, response, () => {
@@ -105,6 +109,30 @@ export const redditProxy = onRequest({region: "europe-west4"}, (request, respons
             message: "Service has reached its monthly usage limit. Please try again next month.",
           });
           return;
+        }
+
+        // Initialize GeoIP database if not already done
+        if (!geoIPLookup) {
+          try {
+            geoIPLookup = await initializeGeoIP();
+          } catch (error) {
+            logger.error("Failed to initialize GeoIP:", error);
+            // Continue without analytics on error
+          }
+        }
+
+        // Track country analytics (privacy-compliant, no IP storage)
+        if (geoIPLookup) {
+          try {
+            const ip = (request.headers["x-forwarded-for"] as string) || (request as any).ip || "unknown";
+            const country = getCountryFromIP(ip, geoIPLookup);
+            // Fire and forget - don't wait for analytics
+            trackAnonymousRequest(country, "redditProxy").catch((err) =>
+              logger.debug("Analytics tracking error:", err)
+            );
+          } catch (error) {
+            logger.debug("Could not track analytics:", error);
+          }
         }
 
         const subreddit = request.query.subreddit as string;
@@ -174,6 +202,30 @@ export const searchSubredditsProxy = onRequest({region: "europe-west4"}, (reques
             message: "Service has reached its monthly usage limit. Please try again next month.",
           });
           return;
+        }
+
+        // Initialize GeoIP database if not already done
+        if (!geoIPLookup) {
+          try {
+            geoIPLookup = await initializeGeoIP();
+          } catch (error) {
+            logger.error("Failed to initialize GeoIP:", error);
+            // Continue without analytics on error
+          }
+        }
+
+        // Track country analytics (privacy-compliant, no IP storage)
+        if (geoIPLookup) {
+          try {
+            const ip = (request.headers["x-forwarded-for"] as string) || (request as any).ip || "unknown";
+            const country = getCountryFromIP(ip, geoIPLookup);
+            // Fire and forget - don't wait for analytics
+            trackAnonymousRequest(country, "searchSubredditsProxy").catch((err) =>
+              logger.debug("Analytics tracking error:", err)
+            );
+          } catch (error) {
+            logger.debug("Could not track analytics:", error);
+          }
         }
 
         const query = request.query.query as string;

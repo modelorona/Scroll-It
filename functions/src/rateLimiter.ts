@@ -1,5 +1,3 @@
-// Use any to avoid type conflicts between express versions
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {getFirestore} from "firebase-admin/firestore";
 
 interface RateLimitEntry {

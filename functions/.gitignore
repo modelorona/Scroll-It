@@ -8,3 +8,11 @@ typings/
 # Node.js dependency directory
 node_modules/
 *.local.env
+
+# GeoLite2 database file (download from MaxMind)
+GeoLite2-Country.mmdb
+
+# Firebase service account keys
+*serviceAccountKey*.json
+*service-account*.json
+*.key.json

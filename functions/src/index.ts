@@ -16,6 +16,7 @@ import cors from "cors";
 import {redditProxy, searchSubredditsProxy} from "./proxy";
 import {cleanupExpiredRateLimits} from "./rateLimiter";
 import {getAllowedOrigins, getLocalhostSecret} from "./config";
+import {getAnalyticsStats} from "./anonymousAnalytics";
 
 // Initialize Firebase Admin
 initializeApp();
@@ -23,6 +24,7 @@ initializeApp();
 setGlobalOptions({maxInstances: 10});
 
 export {redditProxy, searchSubredditsProxy};
+
 
 // CORS handler for proxyStatus endpoint
 const statusCorsHandler = cors({
@@ -174,4 +176,32 @@ export const cleanupRateLimits = onSchedule({
   region: "europe-west1",
 }, async () => {
   await cleanupExpiredRateLimits();
+});
+
+// Analytics viewer endpoint - returns anonymous aggregated statistics
+export const analyticsStatus = onRequest({region: "europe-west4"}, async (request, response) => {
+  // Use the same CORS handler as status endpoint for consistency
+  statusCorsHandler(request, response, () => {
+    validateStatusLocalhostSecret(request, response, async () => {
+      try {
+        // Get month from query parameter or use current month
+        const month = request.query.month as string | undefined;
+
+        // Fetch anonymous aggregated stats
+        const stats = await getAnalyticsStats(month);
+
+        response.status(200).json({
+          success: true,
+          data: stats,
+          privacy: "This data is completely anonymous. No personal information or IP addresses are stored.",
+        });
+      } catch (error) {
+        logger.error("Error fetching analytics:", error);
+        response.status(500).json({
+          success: false,
+          error: "Failed to fetch analytics data",
+        });
+      }
+    });
+  });
 });

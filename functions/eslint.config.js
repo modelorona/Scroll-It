@@ -48,6 +48,7 @@ module.exports = [
       "lib/**/*",
       "generated/**/*",
       "node_modules/**/*",
+      "scripts/**/*",
       "eslint.config.js",
       "*.config.js",
     ],

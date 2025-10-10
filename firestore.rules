@@ -12,6 +12,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Analytics collection - only accessible by Cloud Functions
+    // Stores only anonymous aggregated data (no personal information)
+    match /analytics/{document=**} {
+      allow read, write: if false;
+    }
+
     // Add your other collection rules here
     // Example:
     // match /users/{userId} {
