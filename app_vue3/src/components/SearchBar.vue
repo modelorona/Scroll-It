@@ -1,3 +1,19 @@
+<!--
+  - Copyright 2025 Clidey, Inc.
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
 <template>
   <v-row>
     <v-col
@@ -14,6 +30,8 @@
         hint="Start typing to search for a subreddit"
         label="Enter Subreddit Name"
         @keyup.enter="search"
+        @focus="handleFocus"
+        @update:search="handleSearchUpdate"
       >
         <template #append-inner>
           <v-btn
@@ -69,9 +87,9 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { useGalleryStore } from '@/stores/gallery';
-import { debounce } from 'lodash';
+import {ref, watch} from 'vue';
+import {useGalleryStore} from '@/stores/gallery';
+import {debounce} from 'lodash';
 
 const props = defineProps({
   subreddit: {
@@ -94,6 +112,7 @@ const sortOption = ref(props.sortOption);
 const subredditItems = ref([]);
 const loading = ref(false);
 const isMenuOpen = ref(false);
+const justSearched = ref(false);
 
 const sortOptions = ['hot', 'new', 'top'];
 
@@ -107,6 +126,9 @@ watch(() => props.subreddit, (newValue) => {
 watch(() => subreddit.value, (newValue) => {
   if (newValue && newValue !== searchQuery.value) {
     searchQuery.value = newValue;
+    // Close the menu when a subreddit is selected from the dropdown
+    isMenuOpen.value = false;
+    justSearched.value = true;
   }
 });
 
@@ -119,6 +141,7 @@ const search = () => {
   emit('update:subreddit', searchQuery.value);
   emit('search');
   isMenuOpen.value = false;
+  justSearched.value = true;
 };
 
 const reset = () => {
@@ -126,6 +149,19 @@ const reset = () => {
   searchQuery.value = '';
   emit('update:subreddit', '');
   emit('reset');
+  justSearched.value = false;
+};
+
+const handleFocus = () => {
+  // Reset the flag when the input is focused so dropdown can work normally
+  justSearched.value = false;
+};
+
+const handleSearchUpdate = (newValue) => {
+  // Reset the flag when user types something new
+  if (newValue !== searchQuery.value) {
+    justSearched.value = false;
+  }
 };
 
 const updateSort = (sort) => {
@@ -140,7 +176,12 @@ const fetchSubredditSuggestions = async (query) => {
   }
   loading.value = true;
   subredditItems.value = await galleryStore.searchSubreddits(query);
-  isMenuOpen.value = subredditItems.value.length > 0;
+
+  // Only open menu if we haven't just searched/selected
+  if (!justSearched.value) {
+    isMenuOpen.value = subredditItems.value.length > 0;
+  }
+
   loading.value = false;
 };
 
