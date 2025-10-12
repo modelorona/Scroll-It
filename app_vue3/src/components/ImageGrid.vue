@@ -93,7 +93,7 @@ const showBackToTop = ref(false);
 
 const handleScroll = (event) => {
   const { scrollTop, clientHeight, scrollHeight } = event.target;
-  if (scrollTop + clientHeight >= scrollHeight - 500) { // 500px threshold
+  if (scrollTop + clientHeight >= scrollHeight - 500 && !props.fetchingImages) { // 500px threshold
     emit("loadMore");
   }
   showBackToTop.value = scrollTop > 200;
