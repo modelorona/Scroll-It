@@ -77,6 +77,26 @@
         </v-row>
       </div>
     </div>
+
+    <!-- Loading indicator for infinite scroll -->
+    <v-row
+      v-if="fetchingImages && posts.length > 0"
+      class="mt-4 mb-8"
+      justify="center"
+    >
+      <v-col class="text-center" cols="12">
+        <v-progress-circular
+          :size="40"
+          :width="4"
+          color="primary"
+          indeterminate
+        />
+        <div class="text-h6 mt-2 text-medium-emphasis">
+          Loading more images...
+        </div>
+      </v-col>
+    </v-row>
+
     <v-fab
       v-if="showBackToTop"
       icon="mdi-arrow-up"
