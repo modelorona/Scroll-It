@@ -1,10 +1,25 @@
+<!--
+  - Copyright 2025 Clidey, Inc.
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
 <template>
   <v-container fluid>
     <div
       v-if="posts.length > 0"
       v-bind="containerProps"
       class="virtual-scroll-container"
-      @scroll.passive="handleScroll"
     >
       <div v-bind="wrapperProps">
         <v-row
@@ -74,8 +89,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useVirtualList } from "@vueuse/core";
+import {computed, onMounted, onUnmounted, ref} from "vue";
+import {useVirtualList} from "@vueuse/core";
 import logo from "@/assets/logo-white.png";
 
 const props = defineProps({
@@ -91,8 +106,11 @@ const emit = defineEmits(["selectImage", "loadMore"]);
 
 const showBackToTop = ref(false);
 
-const handleScroll = (event) => {
-  const { scrollTop, clientHeight, scrollHeight } = event.target;
+const handleScroll = () => {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const clientHeight = window.innerHeight;
+  const scrollHeight = document.documentElement.scrollHeight;
+
   if (scrollTop + clientHeight >= scrollHeight - 500 && !props.fetchingImages) { // 500px threshold
     emit("loadMore");
   }
@@ -100,17 +118,14 @@ const handleScroll = (event) => {
 };
 
 const scrollToTop = () => {
-  const container = document.querySelector('.virtual-scroll-container');
-  if (container) {
-    container.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  }
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 };
 
 // Add originalIndex to each post for the click handler
-const postsWithIndex = computed(() => 
+const postsWithIndex = computed(() =>
   props.posts.map((post, index) => ({ ...post, originalIndex: index }))
 );
 
@@ -148,4 +163,47 @@ const getThumbnail = (post) => {
   // If all else fails, return empty to trigger the error slot
   return '';
 };
+
+// Add window scroll event listener
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll, {passive: true});
+  // Check initial scroll position
+  handleScroll();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
 </script>
+
+<style scoped>
+.virtual-scroll-container {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.image-container {
+  position: relative;
+}
+
+.album-icon,
+.video-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 50%;
+  padding: 4px;
+}
+
+.link-cursor {
+  cursor: pointer;
+}
+
+.placeholder-image {
+  opacity: 0.3;
+}
+</style>
