@@ -29,7 +29,7 @@
     "eslint-plugin-n": "^17.23.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^7.2.1",
-    "eslint-plugin-vue": "^10.4.0",
+    "eslint-plugin-vue": "^10.5.0",
     "eslint-plugin-vuetify": "^2.5.3",
     "pinia": "^3.0.3",
     "sass": "1.90.0",
