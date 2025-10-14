@@ -179,13 +179,24 @@ export const useGalleryStore = defineStore('gallery', {
           .map((post: any) => {
             const { data } = post
             // Album / Gallery
-            if (data.is_gallery) {
-              const images = Object.keys(data.media_metadata).map(id => {
-                const media = data.media_metadata[id]
-                const bestQuality = media.p.find((q: any) => q.x > 1000) || media.s
-                return bestQuality.u.replace(/&amp;/g, '&')
-              })
-              return { postData: data, images, isAlbum: true, mediaType: 'album' }
+            if (data.is_gallery && data.media_metadata) {
+              const images = Object.keys(data.media_metadata)
+                .map(id => {
+                  const media = data.media_metadata[id]
+                  if (!media) return null
+
+                  // Find best quality image, with fallbacks
+                  const bestQuality = media.p?.find((q: any) => q.x > 1000) || media.s
+                  if (!bestQuality || !bestQuality.u) return null
+
+                  return bestQuality.u.replace(/&amp;/g, '&')
+                })
+                .filter(Boolean) // Remove any null entries
+
+              // Only return if we have valid images
+              if (images.length > 0) {
+                return {postData: data, images, isAlbum: true, mediaType: 'album'}
+              }
             }
             // Standard Image
             if (data.post_hint === 'image' && !data.is_self) {
