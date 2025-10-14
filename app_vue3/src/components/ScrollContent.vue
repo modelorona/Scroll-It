@@ -126,7 +126,15 @@ const galleryStore = useGalleryStore();
   }
 
   watch(() => galleryStore.currentIndex, (newValue) => {
-    if (newValue >= galleryStore.visiblePosts.length - 6 && !galleryStore.fetchingImages) {
+    // Only fetch more if:
+    // 1. We have posts already (avoid infinite loop when empty)
+    // 2. We're near the end of current posts
+    // 3. Not already fetching
+    // 4. No error state
+    if (galleryStore.visiblePosts.length > 0 &&
+      newValue >= galleryStore.visiblePosts.length - 6 &&
+      !galleryStore.fetchingImages &&
+      !galleryStore.error) {
       galleryStore.fetchRedditImages();
     }
   });

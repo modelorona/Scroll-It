@@ -131,7 +131,10 @@ const handleScroll = () => {
   const clientHeight = window.innerHeight;
   const scrollHeight = document.documentElement.scrollHeight;
 
-  if (scrollTop + clientHeight >= scrollHeight - 500 && !props.fetchingImages) { // 500px threshold
+  // Only load more if we have posts and not already fetching
+  if (props.posts.length > 0 &&
+    scrollTop + clientHeight >= scrollHeight - 500 &&
+    !props.fetchingImages) { // 500px threshold
     emit("loadMore");
   }
   showBackToTop.value = scrollTop > 200;

@@ -319,7 +319,11 @@ export const useGalleryStore = defineStore('gallery', {
       }
     },
     nextImage() {
-      if (this.currentIndex >= this.visiblePosts.length - 10 && !this.fetchingImages) {
+      // Only fetch more if we have posts and are near the end
+      if (this.visiblePosts.length > 0 &&
+        this.currentIndex >= this.visiblePosts.length - 10 &&
+        !this.fetchingImages &&
+        !this.error) {
         this.fetchRedditImages();
       }
       const currentPost = this.visiblePosts[this.currentIndex];
