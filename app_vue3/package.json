@@ -32,7 +32,7 @@
     "eslint-plugin-vue": "^10.5.1",
     "eslint-plugin-vuetify": "^2.5.3",
     "pinia": "^3.0.3",
-    "sass": "1.90.0",
+    "sass": "1.93.3",
     "typescript": "5.8.3",
     "typescript-eslint": "^8.46.1",
     "unplugin-auto-import": "^20.2.0",
