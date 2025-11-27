@@ -36,7 +36,14 @@ function getFetchOptions(url: string): RequestInit {
   // 1. We're on localhost
   // 2. Have a secret configured
   // 3. Making a request to our proxy endpoints (not Reddit directly)
-  const isProxyRequest = url.includes('scrollit-f3849.cloudfunctions.net');
+  let isProxyRequest = false;
+  try {
+    const urlObj = new URL(url, window.location.origin);
+    isProxyRequest = urlObj.hostname === 'scrollit-f3849.cloudfunctions.net';
+  } catch (e) {
+    // If parsing fails, treat as non-proxy request
+    isProxyRequest = false;
+  }
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   if (LOCALHOST_SECRET && isLocalhost && isProxyRequest) {
