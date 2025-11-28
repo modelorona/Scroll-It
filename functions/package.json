@@ -10,29 +10,27 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
-  "engines": {
-    "node": "22"
-  },
   "main": "lib/index.js",
   "dependencies": {
-    "@google-cloud/functions-framework": "^4.0.0",
-    "axios": "^1.12.2",
-    "cors": "^2.8.5",
-    "firebase-admin": "^13.5.0",
-    "firebase-functions": "^6.5.0",
-    "maxmind": "^5.0.0"
+    "@google-cloud/functions-framework": "4.0.0",
+    "axios": "1.12.2",
+    "cors": "2.8.5",
+    "firebase-admin": "13.5.0",
+    "firebase-functions": "6.5.0",
+    "maxmind": "5.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.37.0",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.46.0",
-    "@typescript-eslint/parser": "^8.46.0",
-    "eslint": "^9.37.0",
-    "eslint-config-google": "^0.14.0",
-    "eslint-plugin-import": "^2.32.0",
-    "firebase-functions-test": "^3.4.1",
-    "typescript": "^5.9.3"
+    "@eslint/js": "9.37.0",
+    "@types/cors": "2.8.19",
+    "@types/express": "5.0.3",
+    "@typescript-eslint/eslint-plugin": "8.46.0",
+    "@typescript-eslint/parser": "8.46.0",
+    "eslint": "9.37.0",
+    "eslint-config-google": "0.14.0",
+    "eslint-plugin-import": "2.32.0",
+    "firebase-functions-test": "3.4.1",
+    "typescript": "5.9.3"
   },
-  "private": true
+  "private": true,
+  "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a"
 }

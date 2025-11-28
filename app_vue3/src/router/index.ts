@@ -29,7 +29,7 @@ import type {RouteLocationNormalized} from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    ...setupLayouts(routes),
+    ...setupLayouts([...routes]),
     // {
     //   path: '/r/:subreddit/',
     //   component: () => import('@/pages/index.vue'),
