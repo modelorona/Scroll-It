@@ -27,8 +27,8 @@
         :items="subredditItems"
         :loading="loading"
         clearable
-        hint="Start typing to search for a subreddit"
-        label="Enter Subreddit Name"
+        hint="Enter one subreddit or multiple separated by commas"
+        label="Enter Subreddit Name(s)"
         @keyup.enter="search"
         @focus="handleFocus"
         @update:search="handleSearchUpdate"
