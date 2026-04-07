@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Clidey, Inc.
+ * Copyright 2025 modelorona
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,11 +55,12 @@ function getFetchOptions(url: string): RequestInit {
   return options;
 }
 
-function normalizeSubreddits(input: string): string {
+export function normalizeSubreddits(input: string): string {
   return input
     .split(',')
     .map(s => s.trim())
     .filter(Boolean)
+    .filter(s => /^[a-zA-Z0-9_-]{2,21}$/.test(s))
     .join('+');
 }
 
@@ -165,6 +166,11 @@ export const useGalleryStore = defineStore('gallery', {
       this.error = null;
       try {
         const subredditsParam = normalizeSubreddits(this.subreddit);
+        if (!subredditsParam) {
+          this.error = 'No valid subreddit names provided.';
+          this.fetchingImages = false;
+          return;
+        }
         let url;
         if (settingsStore.useProxy) {
           const params = new URLSearchParams({

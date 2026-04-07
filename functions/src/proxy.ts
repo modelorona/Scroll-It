@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 modelorona
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import axios from "axios";
@@ -137,6 +153,8 @@ export const redditProxy = onRequest({region: "europe-west4"}, (request, respons
 
         const subreddit = request.query.subreddit as string;
         const after = request.query.after as string;
+        const sort = request.query.sort as string || "hot";
+        const limit = request.query.limit as string || "100";
 
         if (!subreddit) {
           response.status(400).json({
@@ -146,11 +164,38 @@ export const redditProxy = onRequest({region: "europe-west4"}, (request, respons
           return;
         }
 
-        // Validate subreddit name format (alphanumeric, underscores, hyphens only, 3-21 chars)
-        if (!/^[a-zA-Z0-9_-]{3,21}$/.test(subreddit)) {
+        // Validate each subreddit name (supports multi-subreddit via + separator)
+        const subreddits = subreddit.split("+");
+        if (subreddits.length > 10) {
+          response.status(400).json({
+            error: "Bad Request",
+            message: "Maximum 10 subreddits allowed",
+          });
+          return;
+        }
+        if (!subreddits.every((s) => /^[a-zA-Z0-9_-]{2,21}$/.test(s))) {
           response.status(400).json({
             error: "Bad Request",
             message: "Invalid subreddit name format",
+          });
+          return;
+        }
+
+        // Validate sort option
+        if (!["hot", "new", "top", "rising"].includes(sort)) {
+          response.status(400).json({
+            error: "Bad Request",
+            message: "Invalid sort option",
+          });
+          return;
+        }
+
+        // Validate limit (1-100)
+        const limitNum = parseInt(limit, 10);
+        if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+          response.status(400).json({
+            error: "Bad Request",
+            message: "Limit must be between 1 and 100",
           });
           return;
         }
@@ -166,7 +211,9 @@ export const redditProxy = onRequest({region: "europe-west4"}, (request, respons
 
         // Use OAuth endpoint with authentication
         const token = await getRedditAccessToken();
-        const url = `https://oauth.reddit.com/r/${subreddit}/${after ? `?after=${after}` : ""}`;
+        const params = new URLSearchParams({sort, limit});
+        if (after) params.append("after", after);
+        const url = `https://oauth.reddit.com/r/${subreddit}/${sort}.json?${params.toString()}`;
 
         try {
           const redditResponse = await axios.get(url, {

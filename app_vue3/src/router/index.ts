@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Clidey, Inc.
+ * Copyright 2025 modelorona
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,6 @@ const router = createRouter({
     {
       path: '/r/:subreddits',
       component: () => import('@/pages/index.vue'),
-      props: (route: any) => ({
-        subreddits: route.params.subreddits || '',
-        sortOption: route.query.type || 'hot',
-      }),
     },
   ],
 })

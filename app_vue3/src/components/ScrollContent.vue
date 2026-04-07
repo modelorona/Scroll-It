@@ -1,5 +1,5 @@
 <!--
-  - Copyright 2025 Clidey, Inc.
+  - Copyright 2025 modelorona
   -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
       v-model:sort-option="galleryStore.sortOption"
       v-model:subreddit="galleryStore.subreddit"
       @reset="galleryStore.resetSearch"
-      @search="galleryStore.fetchRedditImages(true)"
+      @search="handleSearch"
     />
 
     <NSFWAlert
@@ -110,12 +110,21 @@
 </template>
 
 <script setup>
-import {useGalleryStore} from '@/stores/gallery';
-import {useRoute} from 'vue-router';
+import {useGalleryStore, normalizeSubreddits} from '@/stores/gallery';
+import {useRoute, useRouter} from 'vue-router';
 import {watch, onMounted} from 'vue';
 
 const galleryStore = useGalleryStore();
 const route = useRoute();
+const router = useRouter();
+
+function handleSearch() {
+  galleryStore.fetchRedditImages(true);
+  const normalized = normalizeSubreddits(galleryStore.subreddit);
+  if (normalized) {
+    router.replace(`/r/${normalized}?type=${galleryStore.sortOption}`);
+  }
+}
 
 onMounted(() => {
   const subsParam = route.params.subreddits || route.params.subreddit || '';

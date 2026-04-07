@@ -1,5 +1,5 @@
 <!--
-  - Copyright 2025 Clidey, Inc.
+  - Copyright 2025 modelorona
   -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
@@ -122,11 +122,16 @@ watch(() => props.subreddit, (newValue) => {
   searchQuery.value = newValue;
 });
 
-// When a subreddit is selected from the list, update the search query to match
+// When a subreddit is selected from the dropdown, append it to existing comma-separated input
 watch(() => subreddit.value, (newValue) => {
   if (newValue && newValue !== searchQuery.value) {
-    searchQuery.value = newValue;
-    // Close the menu when a subreddit is selected from the dropdown
+    const parts = searchQuery.value.split(',').map(s => s.trim()).filter(Boolean);
+    if (parts.length > 1) {
+      parts[parts.length - 1] = newValue;
+      searchQuery.value = parts.join(', ');
+    } else {
+      searchQuery.value = newValue;
+    }
     isMenuOpen.value = false;
     justSearched.value = true;
   }
@@ -170,12 +175,14 @@ const updateSort = (sort) => {
 };
 
 const fetchSubredditSuggestions = async (query) => {
-  if (!query || query.length < 2) {
+  // For comma-separated input, only search the last term
+  const lastTerm = query?.split(',').pop()?.trim() || '';
+  if (!lastTerm || lastTerm.length < 2) {
     subredditItems.value = [];
     return;
   }
   loading.value = true;
-  subredditItems.value = await galleryStore.searchSubreddits(query);
+  subredditItems.value = await galleryStore.searchSubreddits(lastTerm);
 
   // Only open menu if we haven't just searched/selected
   if (!justSearched.value) {
