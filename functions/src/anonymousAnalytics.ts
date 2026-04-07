@@ -91,7 +91,7 @@ export async function initializeGeoIP(): Promise<any> {
           lookupInstance = await maxmind.open<CountryResponse>(localPath);
           logger.info("GeoIP database initialized from local file (development)");
         } else {
-          throw new Error("No local database file found");
+          throw new Error("No local database file found", {cause: storageError});
         }
       } catch (localError) {
         logger.error("Failed to initialize GeoIP database:", localError);
@@ -237,7 +237,7 @@ export async function getAnalyticsStats(
     };
   } catch (error) {
     logger.error("Failed to get analytics stats:", error);
-    throw new Error("Failed to retrieve analytics data");
+    throw new Error("Failed to retrieve analytics data", {cause: error});
   }
 }
 

@@ -1,7 +1,6 @@
 const eslint = require("@eslint/js");
 const tseslint = require("@typescript-eslint/eslint-plugin");
 const tsparser = require("@typescript-eslint/parser");
-const importPlugin = require("eslint-plugin-import");
 
 module.exports = [
   eslint.configs.recommended,
@@ -30,15 +29,11 @@ module.exports = [
     },
     plugins: {
       "@typescript-eslint": tseslint,
-      "import": importPlugin,
     },
     rules: {
       ...tseslint.configs.recommended.rules,
       "quotes": ["error", "double"],
-      "import/no-unresolved": 0,
       "@typescript-eslint/no-explicit-any": 0,
-      // "indent": ["error", 2],
-      // "max-len": ["error", {"code": 120}],
       "require-jsdoc": 0,
       "valid-jsdoc": 0,
     },

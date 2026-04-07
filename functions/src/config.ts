@@ -161,7 +161,7 @@ export async function getRedditAccessToken(): Promise<string> {
     } else {
       logger.error("Failed to get Reddit OAuth token: Unknown error");
     }
-    throw new Error("Failed to authenticate with Reddit API");
+    throw new Error("Failed to authenticate with Reddit API", {cause: error});
   } finally {
     tokenRefreshInProgress = false;
   }
