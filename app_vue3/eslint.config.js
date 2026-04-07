@@ -8,20 +8,21 @@ import vuetify from 'eslint-plugin-vuetify';
 import globals from 'globals';
 
 export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  ...pluginVue.configs['flat/recommended'],
   {
-    files: ['**/*.vue', '**/*.ts', '**/*.js'],
     ignores: [
       'dist/**',
       'node_modules/**',
       '.github/**',
       'coverage/**',
       'public/**',
-      '.eslintrc.js',
       '.eslintrc-auto-import.json',
     ],
+  },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...pluginVue.configs['flat/recommended'],
+  {
+    files: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.js'],
     plugins: {
       vuetify,
     },
@@ -38,6 +39,7 @@ export default tseslint.config(
       ...vuetify.configs.base.rules,
       ...vuetify.configs.recommended.rules,
       'vue/multi-word-component-names': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 );

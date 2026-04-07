@@ -84,7 +84,10 @@
       class="mt-4 mb-8"
       justify="center"
     >
-      <v-col class="text-center" cols="12">
+      <v-col
+        class="text-center"
+        cols="12"
+      >
         <v-progress-circular
           :size="40"
           :width="4"

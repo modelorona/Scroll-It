@@ -16,7 +16,7 @@
 
 <template>
   <v-app>
-    <v-app-bar :elevation="10">
+    <v-app-bar :elevation="5">
       <v-app-bar-title>
         <div class="d-flex align-center">
           <!-- todo: use router-link in the future -->

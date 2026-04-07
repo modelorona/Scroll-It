@@ -40,7 +40,7 @@ function getFetchOptions(url: string): RequestInit {
   try {
     const urlObj = new URL(url, window.location.origin);
     isProxyRequest = urlObj.hostname === 'scrollit-f3849.cloudfunctions.net';
-  } catch (e) {
+  } catch {
     // If parsing fails, treat as non-proxy request
     isProxyRequest = false;
   }
@@ -336,7 +336,11 @@ export const useGalleryStore = defineStore('gallery', {
       this.isPlaying = false;
     },
     toggleSlideshow() {
-      this.isPlaying ? this.stopSlideshow() : this.startSlideshow();
+      if (this.isPlaying) {
+        this.stopSlideshow();
+      } else {
+        this.startSlideshow();
+      }
     },
     slideshowNext() {
       const currentPost = this.visiblePosts[this.currentIndex];
