@@ -112,20 +112,24 @@
 <script setup>
 import {useGalleryStore} from '@/stores/gallery';
 import {useRoute} from 'vue-router';
-import {watch} from 'vue';
+import {watch, onMounted} from 'vue';
 
 const galleryStore = useGalleryStore();
-  const route = useRoute();
+const route = useRoute();
 
-  // Set initial subreddit from route params
-  if (route.params.subreddit) {
-    galleryStore.subreddit = route.params.subreddit;
+onMounted(() => {
+  const subsParam = route.params.subreddits || route.params.subreddit || '';
+  if (subsParam) {
+    const subs = subsParam.replace(/\+/g, ', ');
+    galleryStore.subreddit = subs;
+    galleryStore.fetchRedditImages(true);
   }
   if (route.query.type) {
     galleryStore.sortOption = route.query.type;
   }
+});
 
-  watch(() => galleryStore.currentIndex, (newValue) => {
+watch(() => galleryStore.currentIndex, (newValue) => {
     // Only fetch more if:
     // 1. We have posts already (avoid infinite loop when empty)
     // 2. We're near the end of current posts

@@ -55,6 +55,14 @@ function getFetchOptions(url: string): RequestInit {
   return options;
 }
 
+function normalizeSubreddits(input: string): string {
+  return input
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .join('+');
+}
+
 interface PostData {
   over_18: boolean;
   permalink: string;
@@ -156,10 +164,11 @@ export const useGalleryStore = defineStore('gallery', {
       this.fetchingImages = true;
       this.error = null;
       try {
+        const subredditsParam = normalizeSubreddits(this.subreddit);
         let url;
         if (settingsStore.useProxy) {
           const params = new URLSearchParams({
-            subreddit: this.subreddit,
+            subreddit: subredditsParam,
             sort: this.sortOption,
             limit: '100',
           });
@@ -168,18 +177,18 @@ export const useGalleryStore = defineStore('gallery', {
           }
           url = `${PROXY_URL}?${params.toString()}`;
         } else {
-          url = `https://www.reddit.com/r/${this.subreddit}/${this.sortOption}.json?limit=100${this.after ? `&after=${this.after}` : ''}`;
+          url = `https://www.reddit.com/r/${subredditsParam}/${this.sortOption}.json?limit=100${this.after ? `&after=${this.after}` : ''}`;
         }
         const response = await fetch(url, getFetchOptions(url));
         if (!response.ok) {
-          throw new Error(`Subreddit r/${this.subreddit} not found.`);
+          throw new Error(`Subreddit r/${subredditsParam} not found.`);
         }
         const data = await response.json();
 
         // Check if Reddit returned an empty result (likely blocked/restricted)
         if (reset && data.data.children.length === 0) {
-          console.log('Reddit returned empty results for subreddit:', this.subreddit);
-          throw new Error(`Could not load content from r/${this.subreddit}. This may be due to network restrictions.`);
+          console.log('Reddit returned empty results for subreddit:', subredditsParam);
+          throw new Error(`Could not load content from r/${subredditsParam}. This may be due to network restrictions.`);
         }
 
         const processedPosts = data.data.children
