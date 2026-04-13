@@ -82,6 +82,12 @@
         </div>
       </v-card-text>
       
+      <div
+        v-if="showProgressBar"
+        :key="progressKey"
+        class="slideshow-progress"
+        :style="{ animationDuration: slideshowIntervalMs + 'ms' }"
+      />
       <v-card-actions class="actions-bar">
         <div
           v-if="showTooltip"
@@ -140,7 +146,7 @@
 </template>
 
 <script setup>
-  import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+  import { computed, ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 
   const props = defineProps({
     modelValue: Boolean,
@@ -155,6 +161,10 @@
     hasPrevious: Boolean,
     hasNext: Boolean,
     isPlaying: Boolean,
+    slideshowIntervalMs: {
+      type: Number,
+      default: 5000,
+    },
   })
 
   const emit = defineEmits(['update:modelValue', 'goToLink', 'prevImage', 'nextImage', 'toggleSlideshow', 'stopSlideshow', 'skipPost', 'mediaEnded'])
@@ -162,6 +172,16 @@
   const dialog = ref(props.modelValue)
   const mediaLoading = ref(true)
   const showTooltip = ref(false)
+  const progressKey = ref(0)
+
+  const showProgressBar = computed(() => {
+    return props.isPlaying
+  })
+
+  // Reset progress bar animation on slide change
+  watch([() => props.currentPost, () => props.currentImageIndex], () => {
+    progressKey.value++
+  })
 
   watch(() => props.modelValue, async (newValue) => {
     dialog.value = newValue
@@ -334,6 +354,16 @@ kbd {
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;
   color: #333;
+}
+.slideshow-progress {
+  height: 3px;
+  background: rgb(var(--v-theme-primary));
+  animation: progress-fill linear forwards;
+  flex-shrink: 0;
+}
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: 100%; }
 }
 .album-counter {
   color: rgba(255, 255, 255, 0.7);

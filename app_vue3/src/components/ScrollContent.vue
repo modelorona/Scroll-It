@@ -97,6 +97,7 @@
       :has-next="galleryStore.hasNext"
       :has-previous="galleryStore.hasPrevious"
       :is-playing="galleryStore.isPlaying"
+      :slideshow-interval-ms="galleryStore.slideshowIntervalTimeMs"
       @go-to-link="galleryStore.goToLink"
       @next-image="galleryStore.nextImage"
       @prev-image="galleryStore.prevImage"

@@ -317,10 +317,7 @@ export const useGalleryStore = defineStore('gallery', {
       this.isPlaying = true;
       this.setOverlayImage(startingIndex);
 
-      const post = this.visiblePosts[this.currentIndex];
-      if (post.mediaType !== 'video') {
-        this.slideshowInterval = window.setInterval(this.slideshowNext, this.slideshowIntervalTimeMs);
-      }
+      this.slideshowInterval = window.setInterval(this.slideshowNext, this.slideshowIntervalTimeMs);
     },
     setOverlayImage(index: number) {
       this.imageOverlay = true;
@@ -375,10 +372,7 @@ export const useGalleryStore = defineStore('gallery', {
         if (this.slideshowInterval !== null) {
           window.clearInterval(this.slideshowInterval);
         }
-        const nextPost = this.visiblePosts[this.currentIndex];
-        if (nextPost.mediaType !== 'video') {
-          this.slideshowInterval = window.setInterval(this.slideshowNext, this.slideshowIntervalTimeMs);
-        }
+        this.slideshowInterval = window.setInterval(this.slideshowNext, this.slideshowIntervalTimeMs);
       }
     },
     prevImage() {
