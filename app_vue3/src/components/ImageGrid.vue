@@ -27,19 +27,23 @@
           :key="postRow[0] ? postRow[0].postData.id : ''"
         >
           <v-col
-            v-for="post in postRow"
+            v-for="(post, colIndex) in postRow"
             :key="post.postData.id"
             cols="12"
             md="3"
           >
-            <v-card>
+            <v-card
+              class="card-entrance"
+              :style="{ animationDelay: colIndex * 80 + 'ms' }"
+            >
               <div class="image-container">
-                <v-icon
+                <span
                   v-if="post.mediaType === 'album'"
-                  class="album-icon"
+                  class="album-badge"
                 >
-                  mdi-image-multiple
-                </v-icon>
+                  <v-icon size="small">mdi-image-multiple</v-icon>
+                  {{ post.images.length }}
+                </span>
                 <v-icon
                   v-if="post.mediaType === 'video' || post.mediaType === 'embed'"
                   class="video-icon"
@@ -211,7 +215,21 @@ onUnmounted(() => {
   position: relative;
 }
 
-.album-icon,
+.album-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .video-icon {
   position: absolute;
   top: 8px;
@@ -229,5 +247,20 @@ onUnmounted(() => {
 
 .placeholder-image {
   opacity: 0.3;
+}
+
+.card-entrance {
+  animation: card-fade-up 0.3s ease both;
+}
+
+@keyframes card-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
