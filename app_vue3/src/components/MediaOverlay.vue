@@ -205,10 +205,30 @@
     return props.isPlaying
   })
 
-  // Reset progress bar animation on slide change
+  // Reset progress bar animation and preload next image on slide change
+  const preloadedUrls = new Set()
   watch([() => props.currentPost, () => props.currentImageIndex], () => {
     progressKey.value++
+    preloadNextImage()
   })
+
+  function preloadNextImage() {
+    const post = props.currentPost
+    if (!post) return
+
+    let url = null
+    if (post.mediaType === 'album' && props.currentImageIndex < post.images.length - 1) {
+      // Next image in the same album
+      url = post.images[props.currentImageIndex + 1]
+    }
+    // Don't preload across posts — we don't have access to the next post's data here
+
+    if (url && !preloadedUrls.has(url)) {
+      preloadedUrls.add(url)
+      const img = new Image()
+      img.src = url
+    }
+  }
 
   watch(() => props.modelValue, async (newValue) => {
     dialog.value = newValue
