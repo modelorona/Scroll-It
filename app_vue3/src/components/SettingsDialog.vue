@@ -22,6 +22,35 @@
     <v-card>
       <v-card-title>Settings</v-card-title>
       <v-card-text>
+        <div class="d-flex align-center justify-space-between mb-4">
+          <span>Theme</span>
+          <v-btn-toggle
+            :model-value="theme.global.name.value"
+            mandatory
+            density="compact"
+            @update:model-value="onThemeChange"
+          >
+            <v-btn
+              value="dark"
+              size="small"
+            >
+              <v-icon start>
+                mdi-weather-night
+              </v-icon> Dark
+            </v-btn>
+            <v-btn
+              value="light"
+              size="small"
+            >
+              <v-icon start>
+                mdi-weather-sunny
+              </v-icon> Light
+            </v-btn>
+          </v-btn-toggle>
+        </div>
+
+        <v-divider class="mb-4" />
+
         <v-slider
           v-model="settingsStore.slideshowInterval"
           label="Slideshow Interval (seconds)"
@@ -32,7 +61,8 @@
           hint="The time between slides in the slideshow."
           persistent-hint
           @update:model-value="settingsStore.setSlideshowInterval"
-        />        <div class="text-center">
+        />
+        <div class="text-center">
           {{ settingsStore.slideshowInterval }} seconds
         </div>
       </v-card-text>
@@ -52,6 +82,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useTheme } from 'vuetify'
 import { useSettingsStore } from '@/stores/settings'
 
 const props = defineProps({
@@ -61,7 +92,13 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const settingsStore = useSettingsStore()
+const theme = useTheme()
 const dialog = ref(props.modelValue)
+
+function onThemeChange(value) {
+  theme.global.name.value = value
+  settingsStore.setTheme(value)
+}
 
 watch(() => props.modelValue, (newValue) => {
   dialog.value = newValue

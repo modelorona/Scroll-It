@@ -31,6 +31,36 @@ import { createVuetify } from 'vuetify'
 export default createVuetify({
   ssr: true,
   theme: {
-    defaultTheme: 'dark',
+    defaultTheme: localStorage.getItem('theme') || 'dark',
+    themes: {
+      dark: {
+        dark: true,
+        colors: {
+          primary: '#5C9DFF',
+          secondary: '#7C4DFF',
+          accent: '#FF6D00',
+          error: '#FF5252',
+          warning: '#FFC107',
+          info: '#2196F3',
+          success: '#4CAF50',
+          background: '#121212',
+          surface: '#1E1E1E',
+        },
+      },
+      light: {
+        dark: false,
+        colors: {
+          primary: '#1565C0',
+          secondary: '#5E35B1',
+          accent: '#FF6D00',
+          error: '#D32F2F',
+          warning: '#F9A825',
+          info: '#1976D2',
+          success: '#388E3C',
+          background: '#F5F5F5',
+          surface: '#FFFFFF',
+        },
+      },
+    },
   },
 })

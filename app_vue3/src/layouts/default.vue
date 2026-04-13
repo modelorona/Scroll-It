@@ -46,6 +46,15 @@
       </v-app-bar-title>
 
       <v-btn
+        :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+        @click="toggleTheme"
+      >
+        <v-icon size="large">
+          {{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}
+        </v-icon>
+      </v-btn>
+
+      <v-btn
         aria-label="Open settings"
         @click="settingsDialog = true"
       >
@@ -132,14 +141,26 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useTheme } from 'vuetify'
   import SettingsDialog from '@/components/SettingsDialog.vue'
   import { useGalleryStore } from '@/stores/gallery'
+  import { useSettingsStore } from '@/stores/settings'
 
   const router = useRouter()
+  const theme = useTheme()
   const settingsDialog = ref(false)
   const galleryStore = useGalleryStore()
+  const settingsStore = useSettingsStore()
+
+  const isDark = computed(() => theme.global.current.value.dark)
+
+  function toggleTheme() {
+    const newTheme = isDark.value ? 'light' : 'dark'
+    theme.global.name.value = newTheme
+    settingsStore.setTheme(newTheme)
+  }
 
   function handleLogoClick() {
     galleryStore.resetSearch()

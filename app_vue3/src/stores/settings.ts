@@ -23,6 +23,7 @@ export const useSettingsStore = defineStore('settings', {
     sortOption: localStorage.getItem('sortOption') || 'hot',
     agreedToNSFW: localStorage.getItem('agreedToNSFW') === 'true',
     useProxy: sessionStorage.getItem('useProxy') === 'true',
+    theme: localStorage.getItem('theme') || 'dark',
   }),
   actions: {
     setSlideshowInterval(interval: number) {
@@ -40,6 +41,10 @@ export const useSettingsStore = defineStore('settings', {
     setUseProxy(value: boolean) {
       this.useProxy = value;
       sessionStorage.setItem('useProxy', value.toString());
+    },
+    setTheme(value: string) {
+      this.theme = value;
+      localStorage.setItem('theme', value);
     },
   },
 });
