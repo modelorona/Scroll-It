@@ -21,7 +21,9 @@
     persistent
   >
     <v-card>
-      <v-card-title class="pt-5">Content Not Loading?</v-card-title>
+      <v-card-title class="pt-5">
+        Content Not Loading?
+      </v-card-title>
       <v-card-text>
         <p>We couldn't load content directly from Reddit. This is usually caused by network restrictions or regional access limitations.</p>
         <p>We can route your request through our server instead. This often resolves the issue.</p>

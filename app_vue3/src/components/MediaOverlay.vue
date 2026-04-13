@@ -89,6 +89,12 @@
         >
           Use <kbd>←</kbd>, <kbd>→</kbd> to navigate, <kbd>Space</kbd> to toggle slideshow, and <kbd>Esc</kbd> to close
         </div>
+        <div
+          v-if="currentPost?.mediaType === 'album'"
+          class="album-counter text-center text-caption mb-1"
+        >
+          {{ currentImageIndex + 1 }} of {{ currentPost.images.length }}
+        </div>
         <v-row
           align="center"
           class="flex-wrap"
@@ -328,6 +334,10 @@ kbd {
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;
   color: #333;
+}
+.album-counter {
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.5px;
 }
 /* Hide tooltip on small screens */
 @media (max-width: 768px) {
