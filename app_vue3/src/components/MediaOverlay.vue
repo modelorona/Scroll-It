@@ -113,6 +113,13 @@
             <v-icon>mdi-open-in-new</v-icon> Reddit
           </v-btn>
           <v-btn
+            :disabled="currentPost?.mediaType === 'embed'"
+            :loading="downloading"
+            @click="downloadMedia"
+          >
+            <v-icon>mdi-download</v-icon> Download
+          </v-btn>
+          <v-btn
             :disabled="!hasPrevious"
             @click="$emit('prevImage')"
             @keydown.left.prevent="$emit('prevImage')"
@@ -173,6 +180,7 @@
   const mediaLoading = ref(true)
   const showTooltip = ref(false)
   const progressKey = ref(0)
+  const downloading = ref(false)
 
   const showProgressBar = computed(() => {
     return props.isPlaying
@@ -213,6 +221,31 @@
       }, 1000)
     }
   })
+
+  const downloadMedia = async () => {
+    if (!props.currentPost) return
+    downloading.value = true
+    try {
+      const isAlbum = props.currentPost.mediaType === 'album' || props.currentPost.mediaType === 'image'
+      const url = isAlbum ? props.currentPost.images[props.currentImageIndex] : props.currentPost.images[0]
+      const response = await fetch(url)
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const ext = blob.type.split('/')[1]?.split(';')[0] || 'jpg'
+      const title = props.currentPost.postData.title.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60)
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = `${title}.${ext}`
+      a.click()
+      URL.revokeObjectURL(blobUrl)
+    } catch {
+      // Fallback: open in new tab if fetch fails (e.g. CORS)
+      const url = props.currentPost.images[props.currentImageIndex ?? 0]
+      window.open(url, '_blank')
+    } finally {
+      downloading.value = false
+    }
+  }
 
   const close = () => {
     emit('stopSlideshow')
