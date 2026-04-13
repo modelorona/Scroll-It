@@ -32,7 +32,7 @@
             cols="12"
             md="3"
           >
-            <v-card v-if="!post.postData.over_18 || agreedToNSFW">
+            <v-card>
               <div class="image-container">
                 <v-icon
                   v-if="post.mediaType === 'album'"
@@ -52,6 +52,7 @@
                   class="link-cursor"
                   :src="getThumbnail(post)"
                   cover
+                  loading="lazy"
                   @click="$emit('selectImage', post.originalIndex)"
                 >
                   <template #error>
@@ -104,6 +105,7 @@
 
     <v-fab
       v-if="showBackToTop"
+      aria-label="Back to top"
       icon="mdi-arrow-up"
       class="ma-4 mb-12"
       location="bottom end"
@@ -123,7 +125,6 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  agreedToNSFW: Boolean,
   fetchingImages: Boolean,
 });
 

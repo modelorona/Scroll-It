@@ -84,7 +84,6 @@
     <ImageGridSkeleton v-if="galleryStore.fetchingImages && galleryStore.posts.length === 0" />
     <ImageGrid
       v-else
-      :agreed-to-n-s-f-w="galleryStore.agreedToNSFW"
       :fetching-images="galleryStore.fetchingImages"
       :posts="galleryStore.visiblePosts"
       @select-image="galleryStore.setOverlayImage"

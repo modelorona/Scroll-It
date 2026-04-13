@@ -31,6 +31,7 @@
       </v-row>
       <template #append>
         <v-btn
+          aria-label="Decline NSFW content"
           icon
           size="small"
           @click="decline"
@@ -39,6 +40,7 @@
         </v-btn>
         {{ }}
         <v-btn
+          aria-label="Accept NSFW content"
           icon
           size="small"
           @click="accept"

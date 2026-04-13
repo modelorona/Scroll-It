@@ -45,7 +45,10 @@
         </div>
       </v-app-bar-title>
 
-      <v-btn @click="settingsDialog = true">
+      <v-btn
+        aria-label="Open settings"
+        @click="settingsDialog = true"
+      >
         <v-icon size="large">
           mdi-cog
         </v-icon>
@@ -53,7 +56,10 @@
 
       <v-dialog max-width="500">
         <template #activator="{ props: activatorProps }">
-          <v-btn v-bind="activatorProps">
+          <v-btn
+            v-bind="activatorProps"
+            aria-label="About Scroll-It"
+          >
             <v-icon size="large">
               mdi-information
             </v-icon>

@@ -28,8 +28,11 @@
       color="black"
     >
       <v-icon
+        aria-label="Close overlay"
         class="close-button"
         color="white"
+        role="button"
+        tabindex="0"
         title="Close"
         @click="close"
       >

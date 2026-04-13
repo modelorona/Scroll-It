@@ -22,6 +22,7 @@
     <a
       v-for="item in items"
       :key="item.title"
+      :aria-label="item.title"
       class="d-inline-block mx-2 social-link"
       :href="item.href"
       rel="noopener noreferrer"
