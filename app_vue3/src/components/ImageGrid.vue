@@ -47,6 +47,7 @@
                   mdi-play-circle
                 </v-icon>
                 <v-img
+                  :alt="post.postData.title"
                   :aspect-ratio="1"
                   class="link-cursor"
                   :src="getThumbnail(post)"
@@ -56,6 +57,7 @@
                   <template #error>
                     <v-img
                       :src="logo"
+                      alt="Image failed to load"
                       class="placeholder-image"
                     />
                   </template>
@@ -170,23 +172,18 @@ const { list, containerProps, wrapperProps } = useVirtualList(postRows, {
 });
 
 const getThumbnail = (post) => {
-  // Use the thumbnail from post data if it's a valid URL
+  // For images and albums, use the actual content URL (same source as the overlay)
+  if (post.mediaType === 'image' || post.mediaType === 'album') {
+    return post.images[0];
+  }
+  // For videos/embeds, prefer preview image since images[0] is the video/embed URL
+  if (post.postData.preview?.images[0]?.source?.url) {
+    return post.postData.preview.images[0].source.url.replace(/&amp;/g, '&');
+  }
+  // Last resort: Reddit's thumbnail field
   if (post.postData.thumbnail && post.postData.thumbnail.startsWith('http')) {
     return post.postData.thumbnail;
   }
-  // Fallback for videos/embeds to a higher quality preview if available
-  if ((post.mediaType === 'video' || post.mediaType === 'embed') && post.postData.preview?.images[0]?.source?.url) {
-    return post.postData.preview.images[0].source.url.replace(/&amp;/g, '&');
-  }
-  // Fallback for albums to the first image
-  if (post.mediaType === 'album') {
-    return post.images[0];
-  }
-  // Fallback for single images to the direct URL
-  if (post.mediaType === 'image') {
-    return post.postData.url;
-  }
-  // If all else fails, return empty to trigger the error slot
   return '';
 };
 
