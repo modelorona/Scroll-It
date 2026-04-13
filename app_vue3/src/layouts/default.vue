@@ -16,6 +16,10 @@
 
 <template>
   <v-app>
+    <a
+      href="#main-content"
+      class="skip-to-content"
+    >Skip to content</a>
     <v-app-bar :elevation="5">
       <v-app-bar-title>
         <div
@@ -113,7 +117,7 @@
         </template>
       </v-dialog>
     </v-app-bar>
-    <v-main>
+    <v-main id="main-content">
       <router-view />
     </v-main>
     <SettingsDialog v-model="settingsDialog" />
@@ -136,3 +140,22 @@
     router.push('/')
   }
 </script>
+
+<style scoped>
+  .skip-to-content {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 9999;
+    padding: 8px 16px;
+    background: rgb(var(--v-theme-primary));
+    color: rgb(var(--v-theme-on-primary));
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 0 0 4px 0;
+  }
+
+  .skip-to-content:focus {
+    left: 0;
+  }
+</style>
