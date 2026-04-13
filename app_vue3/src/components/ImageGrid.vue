@@ -177,19 +177,13 @@ const { list, containerProps, wrapperProps } = useVirtualList(postRows, {
 });
 
 const getThumbnail = (post) => {
-  // For images and albums, use the actual content URL (same source as the overlay)
-  if (post.mediaType === 'image' || post.mediaType === 'album') {
-    return post.images[0];
+  if (post.thumbnail) return post.thumbnail;
+  // Fallback for videos/embeds: preview source image
+  if (post.mediaType === 'video' || post.mediaType === 'embed') {
+    const preview = post.postData.preview?.images?.[0]?.source?.url;
+    if (preview) return preview.replace(/&amp;/g, '&');
   }
-  // For videos/embeds, prefer preview image since images[0] is the video/embed URL
-  if (post.postData.preview?.images[0]?.source?.url) {
-    return post.postData.preview.images[0].source.url.replace(/&amp;/g, '&');
-  }
-  // Last resort: Reddit's thumbnail field
-  if (post.postData.thumbnail && post.postData.thumbnail.startsWith('http')) {
-    return post.postData.thumbnail;
-  }
-  return '';
+  return post.images[0] || '';
 };
 
 // Add window scroll event listener

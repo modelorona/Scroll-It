@@ -55,6 +55,24 @@ function getFetchOptions(url: string): RequestInit {
   return options;
 }
 
+function pickThumbnail(data: any): string {
+  const resolutions = data.preview?.images?.[0]?.resolutions;
+  if (resolutions?.length) {
+    // Pick the smallest resolution >= 320px wide, or the largest available
+    const pick = resolutions.find((r: any) => r.width >= 320) || resolutions[resolutions.length - 1];
+    return pick.url.replace(/&amp;/g, '&');
+  }
+  // Fallback to full-res preview source (common for videos/embeds)
+  const previewSource = data.preview?.images?.[0]?.source?.url;
+  if (previewSource) {
+    return previewSource.replace(/&amp;/g, '&');
+  }
+  if (data.thumbnail?.startsWith('http')) {
+    return data.thumbnail;
+  }
+  return '';
+}
+
 export function normalizeSubreddits(input: string): string {
   return input
     .split(',')
@@ -73,6 +91,7 @@ interface PostData {
 interface Post {
   postData: PostData;
   images: string[];
+  thumbnail: string;
   isAlbum: boolean;
   mediaType: 'album' | 'image' | 'video' | 'embed';
 }
@@ -239,18 +258,18 @@ export const useGalleryStore = defineStore('gallery', {
 
               // Only return if we have valid images
               if (images.length > 0) {
-                return {postData: data, images, isAlbum: true, mediaType: 'album'}
+                return {postData: data, images, thumbnail: pickThumbnail(data) || images[0], isAlbum: true, mediaType: 'album'}
               }
             }
             // Standard Image
             if (data.post_hint === 'image' && !data.is_self) {
-              return { postData: data, images: [data.url], isAlbum: false, mediaType: 'image' }
+              return { postData: data, images: [data.url], thumbnail: pickThumbnail(data) || data.url, isAlbum: false, mediaType: 'image' }
             }
             // Reddit-hosted Video
             if (data.is_video && data.post_hint === 'hosted:video') {
               const videoUrl = data.secure_media?.reddit_video?.fallback_url
               if (videoUrl) {
-                return { postData: data, images: [videoUrl], isAlbum: false, mediaType: 'video' }
+                return { postData: data, images: [videoUrl], thumbnail: pickThumbnail(data), isAlbum: false, mediaType: 'video' }
               }
             }
             // Embeds (YouTube, etc.) and direct GIFs (Gfycat, Imgur)
@@ -259,13 +278,13 @@ export const useGalleryStore = defineStore('gallery', {
               if (data.domain === 'gfycat.com' || data.domain === 'i.imgur.com') {
                 const videoUrl = data.preview?.images[0]?.variants?.mp4?.source?.url
                 if (videoUrl) {
-                  return { postData: data, images: [videoUrl.replace(/&amp;/g, '&')], isAlbum: false, mediaType: 'video' }
+                  return { postData: data, images: [videoUrl.replace(/&amp;/g, '&')], thumbnail: pickThumbnail(data), isAlbum: false, mediaType: 'video' }
                 }
               }
               // Embedded Player
               if (data.secure_media?.oembed?.html) {
                 const html = data.secure_media.oembed.html.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-                return { postData: data, images: [html], isAlbum: false, mediaType: 'embed' }
+                return { postData: data, images: [html], thumbnail: pickThumbnail(data), isAlbum: false, mediaType: 'embed' }
               }
             }
             return null
