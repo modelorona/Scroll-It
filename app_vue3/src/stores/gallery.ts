@@ -117,6 +117,7 @@ interface GalleryState {
   } | null;
   error: { message: string; type: string } | null;
   slideshowInterval: number | null;
+  mediaTypeFilter: string[];
 }
 
 export const useGalleryStore = defineStore('gallery', {
@@ -140,6 +141,7 @@ export const useGalleryStore = defineStore('gallery', {
       proxyStatusDetails: null,
       error: null,
       slideshowInterval: null,
+      mediaTypeFilter: [],
     };
   },
   getters: {
@@ -149,6 +151,10 @@ export const useGalleryStore = defineStore('gallery', {
     },
     visiblePosts: (state) => {
       return state.agreedToNSFW ? state.posts : state.posts.filter(post => !post.postData.over_18);
+    },
+    filteredPosts(): Post[] {
+      if (this.mediaTypeFilter.length === 0) return this.visiblePosts;
+      return this.visiblePosts.filter((post: Post) => this.mediaTypeFilter.includes(post.mediaType));
     },
     currentPost(): Post | undefined {
       return this.visiblePosts[this.currentIndex];
@@ -434,6 +440,15 @@ export const useGalleryStore = defineStore('gallery', {
       this.posts = [];
       this.subreddit = '';
       this.after = null;
+      this.mediaTypeFilter = [];
+    },
+    toggleMediaTypeFilter(type: string) {
+      const index = this.mediaTypeFilter.indexOf(type);
+      if (index === -1) {
+        this.mediaTypeFilter.push(type);
+      } else {
+        this.mediaTypeFilter.splice(index, 1);
+      }
     },
     acceptNSFW() {
       this.isNSFWDialogOpen = false;

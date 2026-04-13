@@ -81,11 +81,36 @@
       />
     </v-container>
 
+    <v-container
+      v-if="galleryStore.visiblePosts.length > 0"
+      fluid
+      class="py-0"
+    >
+      <v-chip-group>
+        <v-chip
+          v-for="type in mediaTypes"
+          :key="type.value"
+          :variant="galleryStore.mediaTypeFilter.includes(type.value) ? 'flat' : 'outlined'"
+          :color="galleryStore.mediaTypeFilter.includes(type.value) ? 'primary' : undefined"
+          size="small"
+          @click="galleryStore.toggleMediaTypeFilter(type.value)"
+        >
+          <v-icon
+            start
+            size="small"
+          >
+            {{ type.icon }}
+          </v-icon>
+          {{ type.label }}
+        </v-chip>
+      </v-chip-group>
+    </v-container>
+
     <ImageGridSkeleton v-if="galleryStore.fetchingImages && galleryStore.posts.length === 0" />
     <ImageGrid
       v-else
       :fetching-images="galleryStore.fetchingImages"
-      :posts="galleryStore.visiblePosts"
+      :posts="galleryStore.filteredPosts"
       @select-image="galleryStore.setOverlayImage"
       @load-more="galleryStore.fetchRedditImages"
     />
@@ -115,6 +140,13 @@ import {useRoute, useRouter} from 'vue-router';
 import {watch, onMounted} from 'vue';
 
 const galleryStore = useGalleryStore();
+
+const mediaTypes = [
+  { value: 'image', label: 'Images', icon: 'mdi-image' },
+  { value: 'album', label: 'Albums', icon: 'mdi-image-multiple' },
+  { value: 'video', label: 'Videos', icon: 'mdi-play-circle' },
+  { value: 'embed', label: 'Embeds', icon: 'mdi-youtube' },
+];
 const route = useRoute();
 const router = useRouter();
 
