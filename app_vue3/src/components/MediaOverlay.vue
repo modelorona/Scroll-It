@@ -185,6 +185,7 @@
   const progressKey = ref(0)
   const downloading = ref(false)
   const linkCopied = ref(false)
+  const triggerElement = ref(null)
 
   const showProgressBar = computed(() => {
     return props.isPlaying
@@ -198,6 +199,7 @@
   watch(() => props.modelValue, async (newValue) => {
     dialog.value = newValue
     if (newValue) {
+      triggerElement.value = document.activeElement
       mediaLoading.value = true
       showShortcutTooltip()
       // Handle embeds when dialog opens
@@ -262,6 +264,10 @@
   const close = () => {
     emit('stopSlideshow')
     dialog.value = false
+    nextTick(() => {
+      triggerElement.value?.focus?.()
+      triggerElement.value = null
+    })
   }
 
   // Function to show the tooltip
