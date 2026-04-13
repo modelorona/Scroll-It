@@ -18,9 +18,11 @@
   <v-app>
     <v-app-bar :elevation="5">
       <v-app-bar-title>
-        <div class="d-flex align-center">
-          <!-- todo: use router-link in the future -->
-          <!-- <router-link to="/">  -->
+        <div
+          class="d-flex align-center"
+          style="cursor: pointer;"
+          @click="handleLogoClick"
+        >
           <v-img
             alt="Scroll-It"
             class="shrink mr-2"
@@ -29,8 +31,6 @@
             src="@/assets/logo-white.png"
             transition="scale-transition"
           />
-          <!-- </router-link> -->
-          <!-- <router-link to="/"> -->
           <v-img
             alt="Scroll-It"
             class="shrink mt-1"
@@ -38,7 +38,6 @@
             max-width="100"
             src="@/assets/navbar.png"
           />
-          <!-- </router-link> -->
         </div>
       </v-app-bar-title>
 
@@ -124,7 +123,16 @@
 
 <script lang="ts" setup>
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import SettingsDialog from '@/components/SettingsDialog.vue'
+  import { useGalleryStore } from '@/stores/gallery'
 
+  const router = useRouter()
   const settingsDialog = ref(false)
+  const galleryStore = useGalleryStore()
+
+  function handleLogoClick() {
+    galleryStore.resetSearch()
+    router.push('/')
+  }
 </script>
