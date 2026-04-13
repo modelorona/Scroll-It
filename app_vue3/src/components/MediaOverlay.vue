@@ -50,6 +50,7 @@
         
         <div
           v-if="currentPost"
+          ref="mediaWrapperRef"
           class="media-wrapper"
         >
           <v-img
@@ -157,6 +158,7 @@
 
 <script setup>
   import { computed, ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+  import { useSwipe } from '@vueuse/core'
 
   const props = defineProps({
     modelValue: Boolean,
@@ -186,6 +188,18 @@
   const downloading = ref(false)
   const linkCopied = ref(false)
   const triggerElement = ref(null)
+  const mediaWrapperRef = ref(null)
+
+  const { direction } = useSwipe(mediaWrapperRef, {
+    threshold: 50,
+    onSwipeEnd() {
+      if (direction.value === 'left' && props.hasNext) {
+        emit('nextImage')
+      } else if (direction.value === 'right' && props.hasPrevious) {
+        emit('prevImage')
+      }
+    },
+  })
 
   const showProgressBar = computed(() => {
     return props.isPlaying
