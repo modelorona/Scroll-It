@@ -21,15 +21,13 @@
     persistent
   >
     <v-card>
-      <v-card-title>Having Trouble Fetching Content?</v-card-title>
+      <v-card-title class="pt-5">Content Not Loading?</v-card-title>
       <v-card-text>
-        <p>It seems we're having trouble fetching content from Reddit. This can sometimes be caused by network restrictions or silly age verification requirements set by your country.</p>
-        <p>Would you like to try again using our proxy? This may help bypass the issue.</p>
+        <p>We couldn't load content directly from Reddit. This is usually caused by network restrictions or regional access limitations.</p>
+        <p>We can route your request through our server instead. This often resolves the issue.</p>
 
-        <v-divider class="my-4" />
-
-        <div class="d-flex align-center justify-space-between mb-2">
-          <span class="text-subtitle-2">Proxy Status:</span>
+        <div class="d-flex align-center justify-space-between mt-4 mb-2">
+          <span class="text-subtitle-2">Server status:</span>
           <v-chip
             :color="statusColor"
             :prepend-icon="statusIcon"
@@ -39,22 +37,29 @@
           </v-chip>
         </div>
 
-        <div
-          v-if="galleryStore.proxyStatusDetails"
-          class="text-caption text-medium-emphasis ml-4"
-        >
-          <div>• Rate Limiting: {{ galleryStore.proxyStatusDetails.firestore === 'available' ? '✓ Active' : '✗ Unavailable' }}</div>
-          <div>• Reddit API: {{ galleryStore.proxyStatusDetails.reddit === 'available' ? '✓ Reachable' : '✗ Unreachable' }}</div>
-        </div>
-
         <v-alert
           v-if="galleryStore.proxyStatus === 'degraded'"
           type="warning"
           density="compact"
           class="mt-3"
         >
-          Proxy is partially available. Some features may not work correctly.
+          Our server is experiencing some issues. It may still work, but results could be limited.
         </v-alert>
+
+        <v-expansion-panels
+          v-if="galleryStore.proxyStatusDetails"
+          variant="accordion"
+          class="mt-3"
+        >
+          <v-expansion-panel title="Technical details">
+            <v-expansion-panel-text>
+              <div class="text-caption text-medium-emphasis">
+                <div>Rate Limiting (Firestore): {{ galleryStore.proxyStatusDetails.firestore === 'available' ? '✓ Active' : '✗ Unavailable' }}</div>
+                <div>Reddit API: {{ galleryStore.proxyStatusDetails.reddit === 'available' ? '✓ Reachable' : '✗ Unreachable' }}</div>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -86,9 +91,7 @@ const galleryStore = useGalleryStore()
 
 // Check proxy status when dialog opens
 watch(() => galleryStore.isProxyPromptOpen, (isOpen) => {
-  console.log('ProxyPromptDialog watch triggered, isOpen:', isOpen)
   if (isOpen) {
-    console.log('Checking proxy status...')
     galleryStore.checkProxyStatus()
   }
 })
@@ -115,8 +118,8 @@ const statusIcon = computed(() => {
 
 const statusText = computed(() => {
   switch (galleryStore.proxyStatus) {
-    case 'operational': return 'Fully Operational'
-    case 'degraded': return 'Partially Available'
+    case 'operational': return 'Available'
+    case 'degraded': return 'Limited'
     case 'unavailable': return 'Unavailable'
     case 'checking': return 'Checking...'
     default: return 'Unknown'
