@@ -61,10 +61,21 @@
                 >
                   <template #error>
                     <v-img
-                      :src="logo"
-                      alt="Image failed to load"
-                      class="placeholder-image"
-                    />
+                      :src="getFullImage(post)"
+                      :alt="post.postData.title"
+                      :aspect-ratio="1"
+                      cover
+                      class="link-cursor"
+                      @click="$emit('selectImage', post.originalIndex)"
+                    >
+                      <template #error>
+                        <v-img
+                          :src="logo"
+                          alt="Image failed to load"
+                          class="placeholder-image"
+                        />
+                      </template>
+                    </v-img>
                   </template>
                 </v-img>
               </div>
@@ -178,12 +189,17 @@ const { list, containerProps, wrapperProps } = useVirtualList(postRows, {
 
 const getThumbnail = (post) => {
   if (post.thumbnail) return post.thumbnail;
-  // Fallback for videos/embeds: preview source image
-  if (post.mediaType === 'video' || post.mediaType === 'embed') {
-    const preview = post.postData.preview?.images?.[0]?.source?.url;
-    if (preview) return preview.replace(/&amp;/g, '&');
+  return getFullImage(post);
+};
+
+const getFullImage = (post) => {
+  if (post.mediaType === 'image' || post.mediaType === 'album') {
+    return post.images[0];
   }
-  return post.images[0] || '';
+  const preview = post.postData.preview?.images?.[0]?.source?.url;
+  if (preview) return preview.replace(/&amp;/g, '&');
+  if (post.postData.thumbnail?.startsWith('http')) return post.postData.thumbnail;
+  return '';
 };
 
 // Add window scroll event listener

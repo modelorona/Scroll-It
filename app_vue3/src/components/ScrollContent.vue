@@ -72,6 +72,16 @@
     </v-container>
 
     <v-container
+      v-if="galleryStore.subreddit && galleryStore.visiblePosts.length > 0"
+      fluid
+      class="py-1"
+    >
+      <span class="text-caption text-medium-emphasis">
+        r/{{ galleryStore.subreddit.replace(/,\s*/g, ' + ') }} · {{ galleryStore.sortOption }}
+      </span>
+    </v-container>
+
+    <v-container
       v-if="galleryStore.error"
       fluid
     >
