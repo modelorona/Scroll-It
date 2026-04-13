@@ -21,6 +21,14 @@
       class="skip-to-content"
     >Skip to content</a>
     <v-app-bar :elevation="5">
+      <v-progress-linear
+        :active="galleryStore.fetchingImages"
+        color="primary"
+        indeterminate
+        absolute
+        location="bottom"
+        height="3"
+      />
       <v-app-bar-title>
         <div
           class="d-flex align-center"
