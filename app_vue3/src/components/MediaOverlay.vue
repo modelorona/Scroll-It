@@ -119,6 +119,9 @@
           >
             <v-icon>mdi-download</v-icon> Download
           </v-btn>
+          <v-btn @click="copyLink">
+            <v-icon>{{ linkCopied ? 'mdi-check' : 'mdi-link-variant' }}</v-icon> {{ linkCopied ? 'Copied!' : 'Copy Link' }}
+          </v-btn>
           <v-btn
             :disabled="!hasPrevious"
             @click="$emit('prevImage')"
@@ -181,6 +184,7 @@
   const showTooltip = ref(false)
   const progressKey = ref(0)
   const downloading = ref(false)
+  const linkCopied = ref(false)
 
   const showProgressBar = computed(() => {
     return props.isPlaying
@@ -221,6 +225,14 @@
       }, 1000)
     }
   })
+
+  const copyLink = async () => {
+    if (!props.currentPost) return
+    const url = `https://reddit.com${props.currentPost.postData.permalink}`
+    await navigator.clipboard.writeText(url)
+    linkCopied.value = true
+    setTimeout(() => { linkCopied.value = false }, 2000)
+  }
 
   const downloadMedia = async () => {
     if (!props.currentPost) return
