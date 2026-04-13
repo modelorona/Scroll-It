@@ -76,8 +76,8 @@
       fluid
     >
       <v-alert
-        type="error"
-        :text="galleryStore.error"
+        :type="galleryStore.error.type"
+        :text="galleryStore.error.message"
       />
     </v-container>
 

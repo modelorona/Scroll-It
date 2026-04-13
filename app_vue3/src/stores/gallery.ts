@@ -96,7 +96,7 @@ interface GalleryState {
     firestore: string;
     reddit: string;
   } | null;
-  error: string | null;
+  error: { message: string; type: string } | null;
   slideshowInterval: number | null;
 }
 
@@ -167,7 +167,7 @@ export const useGalleryStore = defineStore('gallery', {
       try {
         const subredditsParam = normalizeSubreddits(this.subreddit);
         if (!subredditsParam) {
-          this.error = 'No valid subreddit names provided.';
+          this.error = { message: 'No valid subreddit names provided.', type: 'warning' };
           this.fetchingImages = false;
           return;
         }
@@ -187,14 +187,25 @@ export const useGalleryStore = defineStore('gallery', {
         }
         const response = await fetch(url, getFetchOptions(url));
         if (!response.ok) {
-          throw new Error(`Subreddit r/${subredditsParam} not found.`);
+          if (response.status === 404) {
+            this.error = { message: `Subreddit r/${subredditsParam} doesn't exist. Check the spelling and try again.`, type: 'error' };
+          } else if (response.status === 403) {
+            this.error = { message: `Subreddit r/${subredditsParam} is private or quarantined.`, type: 'warning' };
+          } else if (response.status === 429) {
+            this.error = { message: 'Too many requests. Please wait a moment and try again.', type: 'warning' };
+          } else {
+            this.error = { message: `Could not load content from r/${subredditsParam} (status ${response.status}).`, type: 'error' };
+          }
+          this.fetchingImages = false;
+          return;
         }
         const data = await response.json();
 
         // Check if Reddit returned an empty result (likely blocked/restricted)
         if (reset && data.data.children.length === 0) {
-          console.log('Reddit returned empty results for subreddit:', subredditsParam);
-          throw new Error(`Could not load content from r/${subredditsParam}. This may be due to network restrictions.`);
+          this.error = { message: `No image content found in r/${subredditsParam}. The subreddit may be empty or restricted in your region.`, type: 'info' };
+          this.fetchingImages = false;
+          return;
         }
 
         const processedPosts = data.data.children
@@ -267,18 +278,13 @@ export const useGalleryStore = defineStore('gallery', {
         if (!this.agreedToNSFW && this.posts.some(p => p.postData.over_18)) {
           this.isNSFWDialogOpen = true;
         }
-      } catch (error: any) {
-        this.error = error.message;
-        console.error('Error fetching data from Reddit:', error);
-        console.log('useProxy:', settingsStore.useProxy);
-        console.log('isProxyPromptOpen before:', this.isProxyPromptOpen);
+      } catch {
+        if (!this.error) {
+          this.error = { message: 'Could not connect to Reddit. Check your internet connection.', type: 'error' };
+        }
         if (!settingsStore.useProxy) {
           this.isProxyPromptOpen = true;
-          console.log('Setting isProxyPromptOpen to true');
-        } else {
-          console.log('Proxy already enabled, not showing prompt');
         }
-        console.log('isProxyPromptOpen after:', this.isProxyPromptOpen);
       } finally {
         this.fetchingImages = false;
       }
