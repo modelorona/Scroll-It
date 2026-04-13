@@ -89,7 +89,7 @@
         class="slideshow-progress"
         :style="{ animationDuration: slideshowIntervalMs + 'ms' }"
       />
-      <v-card-actions class="actions-bar">
+      <div class="actions-bar">
         <div
           v-if="showTooltip"
           class="tooltip"
@@ -98,60 +98,64 @@
         </div>
         <div
           v-if="currentPost?.mediaType === 'album'"
-          class="album-counter text-center text-caption mb-1"
+          class="album-counter"
         >
           {{ currentImageIndex + 1 }} of {{ currentPost.images.length }}
         </div>
-        <v-row
-          align="center"
-          class="flex-wrap"
-          justify="center"
-        >
+        <div class="actions-buttons">
+          <v-btn
+            size="small"
+            :disabled="!hasPrevious"
+            @click="$emit('prevImage')"
+            @keydown.left.prevent="$emit('prevImage')"
+          >
+            <v-icon>mdi-arrow-left</v-icon> Prev
+          </v-btn>
+          <v-btn
+            size="small"
+            :disabled="!hasNext"
+            @click="$emit('nextImage')"
+            @keydown.right.prevent="$emit('nextImage')"
+          >
+            Next <v-icon>mdi-arrow-right</v-icon>
+          </v-btn>
+          <v-btn
+            size="small"
+            @click="$emit('toggleSlideshow')"
+            @keydown.space.prevent="$emit('toggleSlideshow')"
+          >
+            {{ isPlaying ? 'Pause' : 'Play' }}
+            <v-icon>{{ isPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
+          </v-btn>
+          <v-btn
+            size="small"
+            @click="$emit('skipPost')"
+          >
+            Skip <v-icon>mdi-fast-forward</v-icon>
+          </v-btn>
           <v-btn
             color="primary"
+            size="small"
             @click="$emit('goToLink')"
           >
             <v-icon>mdi-open-in-new</v-icon> Reddit
           </v-btn>
           <v-btn
+            size="small"
             :disabled="currentPost?.mediaType === 'embed'"
             :loading="downloading"
             @click="downloadMedia"
           >
             <v-icon>mdi-download</v-icon> Download
           </v-btn>
-          <v-btn @click="copyLink">
+          <v-btn
+            size="small"
+            @click="copyLink"
+          >
             <v-icon>{{ linkCopied ? 'mdi-check' : 'mdi-link-variant' }}</v-icon> {{ linkCopied ? 'Copied!' : 'Copy Link' }}
           </v-btn>
-          <v-btn
-            :disabled="!hasPrevious"
-            @click="$emit('prevImage')"
-            @keydown.left.prevent="$emit('prevImage')"
-          >
-            <v-icon>mdi-arrow-left</v-icon>Previous
-          </v-btn>
-          <v-btn
-            :disabled="!hasNext"
-            @click="$emit('nextImage')"
-            @keydown.right.prevent="$emit('nextImage')"
-          >
-            Next<v-icon>mdi-arrow-right</v-icon>
-          </v-btn>
-          <v-btn @click="$emit('skipPost')">
-            Skip Post<v-icon>mdi-fast-forward</v-icon>
-          </v-btn>
-          <v-btn
-            @click="$emit('toggleSlideshow')"
-            @keydown.space.prevent="$emit('toggleSlideshow')"
-          >
-            {{ isPlaying ? 'Pause Slideshow' : 'Start Slideshow' }} <v-icon v-if="isPlaying">
-              mdi-pause
-            </v-icon> <v-icon v-else>
-              mdi-play
-            </v-icon>
-          </v-btn>
-        </v-row>
-      </v-card-actions>
+        </div>
+      </div>
     </v-card>
   </v-dialog>
 </template>
@@ -401,9 +405,19 @@
   cursor: pointer;
 }
 .actions-bar {
-  flex-shrink: 0; /* Prevent the actions bar from shrinking */
+  flex-shrink: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  position: relative; /* Needed for tooltip positioning */
+  position: relative;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
 }
 .tooltip {
   position: absolute;
@@ -452,7 +466,9 @@ kbd {
 }
 .album-counter {
   color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
   letter-spacing: 0.5px;
+  margin-bottom: 4px;
 }
 /* Hide tooltip on small screens */
 @media (max-width: 768px) {
