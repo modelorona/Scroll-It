@@ -84,11 +84,43 @@
       </v-autocomplete>
     </v-col>
   </v-row>
+  <v-row
+    v-if="settingsStore.searchHistory.length > 0"
+    class="mt-0"
+  >
+    <v-col class="pt-0">
+      <div class="d-flex align-center flex-wrap ga-1">
+        <span class="text-caption text-medium-emphasis mr-1">Recent:</span>
+        <v-chip
+          v-for="term in settingsStore.searchHistory"
+          :key="term"
+          size="small"
+          variant="outlined"
+          @click="searchFromHistory(term)"
+        >
+          {{ term }}
+        </v-chip>
+        <v-btn
+          aria-label="Clear search history"
+          icon
+          size="x-small"
+          variant="text"
+          class="ml-1"
+          @click="settingsStore.clearSearchHistory()"
+        >
+          <v-icon size="small">
+            mdi-close-circle-outline
+          </v-icon>
+        </v-btn>
+      </div>
+    </v-col>
+  </v-row>
 </template>
 
 <script setup>
 import {ref, watch} from 'vue';
 import {useGalleryStore} from '@/stores/gallery';
+import {useSettingsStore} from '@/stores/settings';
 import {debounce} from 'lodash';
 
 const props = defineProps({
@@ -105,6 +137,7 @@ const props = defineProps({
 const emit = defineEmits(['update:subreddit', 'update:sortOption', 'search', 'reset']);
 
 const galleryStore = useGalleryStore();
+const settingsStore = useSettingsStore();
 
 const subreddit = ref(props.subreddit);
 const searchQuery = ref(props.subreddit);
@@ -142,11 +175,19 @@ watch(() => props.sortOption, (newValue) => {
 });
 
 const search = () => {
-  // Use the typed query for the search, not the v-model value
   emit('update:subreddit', searchQuery.value);
   emit('search');
+  settingsStore.addSearchHistory(searchQuery.value);
   isMenuOpen.value = false;
   justSearched.value = true;
+};
+
+const searchFromHistory = (term) => {
+  subreddit.value = term;
+  searchQuery.value = term;
+  emit('update:subreddit', term);
+  emit('search');
+  settingsStore.addSearchHistory(term);
 };
 
 const reset = () => {
@@ -158,7 +199,6 @@ const reset = () => {
 };
 
 const handleFocus = () => {
-  // Reset the flag when the input is focused so dropdown can work normally
   justSearched.value = false;
 };
 
