@@ -239,13 +239,13 @@ export const useGalleryStore = defineStore('gallery', {
             // Decode HTML entities in title (Reddit API returns encoded text)
             if (data.title) {
               data.title = data.title
-                .replace(/&amp;/g, '&')
                 .replace(/&lt;/g, '<')
                 .replace(/&gt;/g, '>')
                 .replace(/&quot;/g, '"')
                 .replace(/&#39;/g, "'")
                 .replace(/&#x27;/g, "'")
                 .replace(/&#x2F;/g, '/')
+                .replace(/&amp;/g, '&')
             }
             // Album / Gallery
             if (data.is_gallery && data.media_metadata) {
