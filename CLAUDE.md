@@ -25,7 +25,9 @@ Key conventions:
 - Routes are file-based in `src/pages/`
 - Layouts managed via vite-plugin-vue-layouts in `src/layouts/`
 
-### 2. Backend: Firebase Cloud Functions (`functions/`)
+### 2. Backend: Firebase Cloud Functions (`functions/`) — NOT IN USE
+**The frontend no longer uses this backend.** The proxy integration was removed from the Vue app (billing cost); the code is kept in the repo for reference but is not deployed or called. The app talks to Reddit's public JSON API directly.
+
 - **Runtime**: Node.js 22
 - **Functions Framework**: Firebase Functions v2
 - **Build**: TypeScript compiled to `lib/` directory
@@ -108,12 +110,9 @@ firebase emulators:start
 ## Environment Configuration
 
 ### Frontend Environment Variables
-Create `app_vue3/.env.local`:
-```
-VITE_LOCALHOST_SECRET=your_secret_here
-```
+None required (the `VITE_LOCALHOST_SECRET` variable was only used for the removed proxy integration).
 
-### Backend Environment Variables
+### Backend Environment Variables (unused backend)
 Firebase Functions uses Firebase Params (defined in `functions/src/config.ts`):
 - `ALLOWED_ORIGINS`: Comma-separated CORS origins
 - `LOCALHOST_SECRET`: Optional secret for localhost access
@@ -129,35 +128,25 @@ The application uses Pinia with three stores in `app_vue3/src/stores/`:
 
 1. **gallery.ts**: Core application state
    - Posts, images, and slideshow management
-   - Reddit API integration (direct or via proxy)
+   - Reddit API integration (direct)
    - NSFW filtering and dialog state
-   - Proxy status checking
    - Subreddit search
 
 2. **settings.ts**: User preferences (persisted to localStorage)
    - Slideshow interval
    - Sort option (hot/new/top/rising)
    - NSFW consent
-   - Proxy usage preference
 
 3. **app.ts**: Global app state (minimal)
 
 ## Reddit API Integration
 
-The app supports two modes:
+The app calls Reddit's public JSON API directly:
+- URL: `https://www.reddit.com/r/{subreddit}/{sort}.json`
+- Limited by CORS and potential network restrictions
+- No authentication required
 
-1. **Direct Mode**: Calls Reddit's public JSON API directly
-   - URL: `https://www.reddit.com/r/{subreddit}/{sort}.json`
-   - Limited by CORS and potential network restrictions
-   - No authentication required
-
-2. **Proxy Mode**: Uses Firebase Cloud Functions as a proxy
-   - Authenticates via Reddit OAuth
-   - Rate limited per IP
-   - Bypasses CORS and network restrictions
-   - Tracks anonymous analytics
-
-The proxy prompt dialog appears when direct mode fails, suggesting users enable proxy mode.
+A Firebase Functions proxy mode previously existed as a fallback; it was removed from the app (the backend code remains in `functions/` but is unused).
 
 ## Key Components
 
@@ -166,7 +155,6 @@ The proxy prompt dialog appears when direct mode fails, suggesting users enable 
 - `MediaOverlay.vue`: Full-screen slideshow view with controls
 - `SearchBar.vue`: Subreddit search with autocomplete
 - `NSFWAlert.vue`: NSFW content warning dialog
-- `ProxyPromptDialog.vue`: Prompts user to enable proxy when direct access fails
 - `SettingsDialog.vue`: User preferences configuration
 
 ## Firebase Integration
@@ -176,7 +164,7 @@ The proxy prompt dialog appears when direct mode fails, suggesting users enable 
   - `analytics`: Anonymous country-level usage statistics
   - `monthlyUsage`: Function invocation tracking
 
-- **Deployment**: Netlify for frontend, Firebase Functions for backend
+- **Deployment**: Netlify for frontend (Firebase Functions backend is no longer deployed)
 - **Security**: Firestore rules defined in `firestore.rules`
 
 ## Testing

@@ -22,7 +22,6 @@ export const useSettingsStore = defineStore('settings', {
     slideshowInterval: parseInt(localStorage.getItem('slideshowInterval') || '5'),
     sortOption: localStorage.getItem('sortOption') || 'hot',
     agreedToNSFW: localStorage.getItem('agreedToNSFW') === 'true',
-    useProxy: sessionStorage.getItem('useProxy') === 'true',
     theme: localStorage.getItem('theme') || 'dark',
     searchHistory: JSON.parse(localStorage.getItem('searchHistory') || '[]') as string[],
   }),
@@ -38,10 +37,6 @@ export const useSettingsStore = defineStore('settings', {
     setAgreedToNSFW(value: boolean) {
       this.agreedToNSFW = value;
       localStorage.setItem('agreedToNSFW', value.toString());
-    },
-    setUseProxy(value: boolean) {
-      this.useProxy = value;
-      sessionStorage.setItem('useProxy', value.toString());
     },
     setTheme(value: string) {
       this.theme = value;
