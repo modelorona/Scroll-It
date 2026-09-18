@@ -1,1 +1,4 @@
+# /reddit/* is handled by the Netlify Function in netlify/functions/reddit.mts
+
+# SPA fallback
 /* /index.html 200

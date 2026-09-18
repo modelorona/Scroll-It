@@ -70,5 +70,14 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    // /reddit/* is served by the Netlify Function (netlify/functions/reddit.mts) in production.
+    // Reddit 403s requests from non-browser clients, so in dev we proxy to the deployed function.
+    // Alternatively run `netlify dev` to serve the function locally.
+    proxy: {
+      '/reddit': {
+        target: 'https://scroll-it.xyz',
+        changeOrigin: true,
+      },
+    },
   },
 })

@@ -141,12 +141,12 @@ The application uses Pinia with three stores in `app_vue3/src/stores/`:
 
 ## Reddit API Integration
 
-The app calls Reddit's public JSON API directly:
-- URL: `https://www.reddit.com/r/{subreddit}/{sort}.json`
-- Limited by CORS and potential network restrictions
-- No authentication required
+Reddit's public JSON API sends no CORS headers and 403-blocks non-browser clients, so the frontend calls same-origin `/reddit/*` paths, served by a Netlify Function (`app_vue3/netlify/functions/reddit.mts`) that forwards to `oauth.reddit.com` using application-only OAuth:
+- Requires `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USERNAME` env vars set in the Netlify UI
+- Allowlists only the listing and subreddit-search paths; caches the OAuth token in warm instances
+- In local dev, Vite proxies `/reddit` to the deployed site (see `vite.config.mts`), or use `netlify dev` to run the function locally
 
-A Firebase Functions proxy mode previously existed as a fallback; it was removed from the app (the backend code remains in `functions/` but is unused).
+A Firebase Functions proxy previously served this purpose; it was removed (billing cost) and the code remains in `functions/` but is unused.
 
 ## Key Components
 

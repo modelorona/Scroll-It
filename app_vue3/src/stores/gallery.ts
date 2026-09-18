@@ -149,7 +149,7 @@ export const useGalleryStore = defineStore('gallery', {
           this.fetchingImages = false;
           return;
         }
-        const url = `https://www.reddit.com/r/${subredditsParam}/${this.sortOption}.json?limit=100${this.after ? `&after=${this.after}` : ''}`;
+        const url = `/reddit/r/${subredditsParam}/${this.sortOption}.json?limit=100${this.after ? `&after=${this.after}` : ''}`;
         const response = await fetch(url);
         if (!response.ok) {
           if (response.status === 404) {
@@ -367,7 +367,7 @@ export const useGalleryStore = defineStore('gallery', {
         return [];
       }
       try {
-        const url = `https://www.reddit.com/api/search_reddit_names.json?query=${encodeURIComponent(query)}&include_over_18=true`;
+        const url = `/reddit/api/search_reddit_names.json?query=${encodeURIComponent(query)}&include_over_18=true`;
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error('Network response was not ok');
