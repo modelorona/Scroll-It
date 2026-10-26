@@ -16,6 +16,7 @@
 
 import {defineStore} from 'pinia';
 import {useSettingsStore} from './settings';
+import {redditFetch} from '../utils/reddit';
 
 function pickThumbnail(data: any): string {
   const resolutions = data.preview?.images?.[0]?.resolutions;
@@ -149,8 +150,8 @@ export const useGalleryStore = defineStore('gallery', {
           this.fetchingImages = false;
           return;
         }
-        const url = `/reddit/r/${subredditsParam}/${this.sortOption}.json?limit=100${this.after ? `&after=${this.after}` : ''}`;
-        const response = await fetch(url);
+        const path = `/r/${subredditsParam}/${this.sortOption}?limit=100${this.after ? `&after=${this.after}` : ''}`;
+        const response = await redditFetch(path);
         if (!response.ok) {
           if (response.status === 404) {
             this.error = { message: `Subreddit r/${subredditsParam} doesn't exist. Check the spelling and try again.`, type: 'error' };
@@ -245,7 +246,7 @@ export const useGalleryStore = defineStore('gallery', {
         }
       } catch {
         if (!this.error) {
-          this.error = { message: 'Could not connect to Reddit. Your network might be blocking it, or Reddit might be restricting access in your region.', type: 'error' };
+          this.error = { message: 'Could not load content from Reddit. Check that the subreddit name is spelled correctly. Otherwise your network might be blocking Reddit, or Reddit might be restricting access in your region.', type: 'error' };
         }
       } finally {
         this.fetchingImages = false;
@@ -367,8 +368,8 @@ export const useGalleryStore = defineStore('gallery', {
         return [];
       }
       try {
-        const url = `/reddit/api/search_reddit_names.json?query=${encodeURIComponent(query)}&include_over_18=true`;
-        const response = await fetch(url);
+        const path = `/api/search_reddit_names?query=${encodeURIComponent(query)}&include_over_18=true`;
+        const response = await redditFetch(path);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

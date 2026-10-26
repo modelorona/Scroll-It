@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-// Reddit proxy as a Netlify Function.
-// Reddit's public JSON endpoints send no CORS headers and 403 non-browser
-// clients, so the frontend calls same-origin /reddit/* and this function
-// forwards to oauth.reddit.com using application-only OAuth.
+// Issues an application-only Reddit OAuth token to the frontend.
+// The browser then calls oauth.reddit.com directly (it sends CORS headers),
+// caching the token in localStorage, so this runs about once per visitor per day.
+// The client secret never leaves this function. The response has no CORS headers,
+// so other websites cannot read the token from a visitor's browser.
 //
 // Required environment variables (set in the Netlify UI):
 //   REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USERNAME
 
-const ALLOWED_PATHS = [
-  /^\/r\/[A-Za-z0-9_+-]{2,200}\/(hot|new|top|rising)\.json$/,
-  /^\/api\/search_reddit_names\.json$/,
-];
+// Reddit tokens last 24h. The CDN shares one response across all visitors for
+// CDN_CACHE_SECONDS, so only reuse a token while it outlives that window by a margin.
+const CDN_CACHE_SECONDS = 6 * 60 * 60;
+const MIN_REMAINING_MS = 12 * 60 * 60 * 1000;
 
 function getUserAgent(): string {
   return `web:scroll-it.xyz:v1.0.0 (by /u/${process.env.REDDIT_USERNAME || 'unknown'})`;
@@ -34,10 +35,9 @@ function getUserAgent(): string {
 // Token cache survives across invocations while the function instance is warm.
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
-async function getAccessToken(): Promise<string> {
-  // Refresh 5 minutes before expiry
-  if (cachedToken && Date.now() < cachedToken.expiresAt - 5 * 60 * 1000) {
-    return cachedToken.token;
+async function getAccessToken(): Promise<{ token: string; expiresAt: number }> {
+  if (cachedToken && Date.now() < cachedToken.expiresAt - MIN_REMAINING_MS) {
+    return cachedToken;
   }
 
   const clientId = process.env.REDDIT_CLIENT_ID;
@@ -53,7 +53,8 @@ async function getAccessToken(): Promise<string> {
       'Content-Type': 'application/x-www-form-urlencoded',
       'User-Agent': getUserAgent(),
     },
-    body: 'grant_type=client_credentials',
+    // The token is handed to browsers, so limit it to reading public data
+    body: 'grant_type=client_credentials&scope=read',
   });
 
   if (!response.ok) {
@@ -65,7 +66,7 @@ async function getAccessToken(): Promise<string> {
     token: data.access_token,
     expiresAt: Date.now() + data.expires_in * 1000,
   };
-  return cachedToken.token;
+  return cachedToken;
 }
 
 export default async (req: Request) => {
@@ -76,38 +77,20 @@ export default async (req: Request) => {
     });
   }
 
-  const url = new URL(req.url);
-  const path = url.pathname.replace(/^\/reddit/, '');
-
-  if (!ALLOWED_PATHS.some(pattern => pattern.test(path))) {
-    return new Response(JSON.stringify({ error: 'Not found' }), {
-      status: 404,
-      headers: { 'content-type': 'application/json' },
-    });
-  }
-
   try {
-    const token = await getAccessToken();
-    // oauth.reddit.com uses the same paths without the .json suffix
-    const target = `https://oauth.reddit.com${path.replace(/\.json$/, '')}${url.search}`;
-
-    const upstream = await fetch(target, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'User-Agent': getUserAgent(),
-      },
-    });
-
-    return new Response(upstream.body, {
-      status: upstream.status,
+    const { token, expiresAt } = await getAccessToken();
+    return new Response(JSON.stringify({ access_token: token, expires_at: expiresAt }), {
       headers: {
         'content-type': 'application/json',
-        'cache-control': 'public, max-age=60',
+        // Browsers keep the token in localStorage instead of the HTTP cache
+        'cache-control': 'no-cache',
+        // One shared response at the edge, so repeat calls don't invoke the function
+        'netlify-cdn-cache-control': `public, s-maxage=${CDN_CACHE_SECONDS}, durable`,
       },
     });
   } catch (error) {
-    console.error('Reddit proxy error:', error);
-    return new Response(JSON.stringify({ error: 'Upstream request failed' }), {
+    console.error('Reddit token error:', error);
+    return new Response(JSON.stringify({ error: 'Token request failed' }), {
       status: 502,
       headers: { 'content-type': 'application/json' },
     });
@@ -115,5 +98,5 @@ export default async (req: Request) => {
 };
 
 export const config = {
-  path: '/reddit/*',
+  path: '/reddit-token',
 };

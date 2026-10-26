@@ -141,12 +141,14 @@ The application uses Pinia with three stores in `app_vue3/src/stores/`:
 
 ## Reddit API Integration
 
-Reddit's public JSON API sends no CORS headers and 403-blocks non-browser clients, so the frontend calls same-origin `/reddit/*` paths, served by a Netlify Function (`app_vue3/netlify/functions/reddit.mts`) that forwards to `oauth.reddit.com` using application-only OAuth:
+Reddit's public `.json` endpoints send no CORS headers and 403 the browser, but `oauth.reddit.com` and its token endpoint do send CORS headers. So the browser calls `oauth.reddit.com` directly (`app_vue3/src/utils/reddit.ts`) with an application-only token:
+- The token comes from a Netlify Function (`app_vue3/netlify/functions/reddit-token.mts`) at `/reddit-token`, which keeps the client secret server-side
 - Requires `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USERNAME` env vars set in the Netlify UI
-- Allowlists only the listing and subreddit-search paths; caches the OAuth token in warm instances
-- In local dev, Vite proxies `/reddit` to the deployed site (see `vite.config.mts`), or use `netlify dev` to run the function locally
+- The browser caches the token (24h) in localStorage and the CDN caches the function response, so the function runs rarely (a previous full-proxy function exhausted Netlify's free plan)
+- Bad tokens and nonexistent-subreddit redirects come back without CORS headers, so they surface as a fetch `TypeError`; `redditFetch` retries once with a fresh token
+- In local dev, Vite proxies `/reddit-token` to the deployed site (see `vite.config.mts`), or use `netlify dev` to run the function locally
 
-A Firebase Functions proxy previously served this purpose; it was removed (billing cost) and the code remains in `functions/` but is unused.
+A Firebase Functions proxy previously served Reddit requests; it was removed (billing cost) and the code remains in `functions/` but is unused.
 
 ## Key Components
 
