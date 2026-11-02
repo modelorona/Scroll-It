@@ -22,19 +22,26 @@
 
 // Composables
 import {createRouter, createWebHistory} from 'vue-router/auto'
-import {setupLayouts} from 'virtual:generated-layouts'
 import {routes} from 'vue-router/auto-routes'
 import type {RouteLocationNormalized} from 'vue-router'
+import DefaultLayout from '@/layouts/default.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts([
-    ...routes,
+  routes: [
     {
-      path: '/r/:subreddits',
-      component: () => import('@/pages/index.vue'),
+      // Every page renders inside the default layout (app bar, footer, settings dialog)
+      path: '/',
+      component: DefaultLayout,
+      children: [
+        ...routes,
+        {
+          path: '/r/:subreddits',
+          component: () => import('@/pages/index.vue'),
+        },
+      ],
     },
-  ]),
+  ],
 })
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
