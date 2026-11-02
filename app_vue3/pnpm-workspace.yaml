@@ -1,0 +1,36 @@
+# pnpm settings. pnpm 11+ only reads registry/auth/network settings from .npmrc;
+# everything pnpm-specific must live here or it is silently ignored.
+# Supply-chain hardening — these also apply in CI, Netlify, and Dependabot runs.
+
+# Require lock file to be up-to-date (fail if package.json doesn't match lock)
+preferFrozenLockfile: true
+
+# Fail on missing or invalid peer dependencies
+strictPeerDependencies: true
+
+# Pin exact versions when adding new dependencies
+saveExact: true
+
+# Audit level - fail on high/critical vulnerabilities
+auditLevel: high
+
+# Disable lifecycle scripts (preinstall, postinstall, etc.) to prevent arbitrary code execution
+ignoreScripts: true
+
+# Fail if a dependency has build scripts that haven't been explicitly allowed
+strictDepBuilds: true
+
+# Verify integrity of packages in the store before linking to node_modules
+verifyStoreIntegrity: true
+
+# Delay installation of packages published less than 7 days ago (minutes)
+minimumReleaseAge: 10080
+
+# Transitive deps may only come from the registry (no git/tarball URLs)
+blockExoticSubdeps: true
+
+# Reject versions published with weaker trust evidence (provenance) than earlier ones
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  # Published by the long-time maintainer without provenance (Dec 2024); newest 4.x, required by sass
+  - chokidar@4.0.3
