@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
-    "@vueuse/core": "14.2.1",
+    "@vueuse/core": "15.0.0",
     "core-js": "3.49.0",
     "lodash": "4.18.1",
     "roboto-fontface": "0.10.0",
