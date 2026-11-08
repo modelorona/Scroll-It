@@ -219,8 +219,8 @@ importers:
         specifier: 2.7.2
         version: 2.7.2(@typescript-eslint/parser@8.58.0(eslint@9.39.4(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.2))(eslint@9.39.4(supports-color@7.2.0))(vue-eslint-parser@10.4.1(eslint@9.39.4(supports-color@7.2.0))(supports-color@7.2.0))(vuetify@4.0.4)
       globals:
-        specifier: 17.4.0
-        version: 17.4.0
+        specifier: 17.13.0
+        version: 17.13.0
       pinia:
         specifier: 3.0.4
         version: 3.0.4(typescript@6.0.2)(vue@3.5.44(typescript@6.0.2))
@@ -1271,8 +1271,8 @@ packages:
     resolution: {integrity: sha512-7ACyT3wmyp3I61S4fG682L0VA2RGD9otkqGJIwNUMF1SWUombIIk+af1unuDYgMm082aHYwD+mzJvv9Iu8dsgg==}
     engines: {node: '>=18'}
 
-  globals@17.4.0:
-    resolution: {integrity: sha512-hjrNztw/VajQwOLsMNT1cbJiH2muO3OROCHnbehc8eY5JyD2gqz4AcMHPqgaOR59DjgUjYAYLeH699g/eWi2jw==}
+  globals@17.13.0:
+    resolution: {integrity: sha512-RwMTC61u7hrG3ZJMkZQOK4JLJrKS8QtoTii63EmWvFXHqycY9FObBJQCbsLxSO8kjKhWE5kV1GC+Vb1g3RI0Zg==}
     engines: {node: '>=18'}
 
   globrex@0.1.2:
@@ -2931,7 +2931,7 @@ snapshots:
 
   globals@15.15.0: {}
 
-  globals@17.4.0: {}
+  globals@17.13.0: {}
 
   globrex@0.1.2: {}
 
