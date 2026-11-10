@@ -368,13 +368,14 @@ export const useGalleryStore = defineStore('gallery', {
         return [];
       }
       try {
-        const path = `/api/search_reddit_names?query=${encodeURIComponent(query)}&include_over_18=true`;
+        // Not /api/search_reddit_names: its CORS preflight rejects the Authorization header
+        const path = `/api/subreddit_autocomplete_v2?query=${encodeURIComponent(query)}&include_over_18=true&include_profiles=false&limit=10`;
         const response = await redditFetch(path);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        return data.names || [];
+        return (data.data?.children ?? []).map((child: { data: { display_name: string } }) => child.data.display_name);
       } catch (error) {
         console.error('Error fetching subreddit suggestions:', error);
         return [];
