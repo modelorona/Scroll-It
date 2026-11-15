@@ -18,7 +18,7 @@
     "vuetify": "4.0.4"
   },
   "devDependencies": {
-    "@babel/types": "7.29.0",
+    "@babel/types": "8.1.0",
     "@eslint/js": "^9.39.4",
     "@types/node": "25.5.0",
     "@vitejs/plugin-vue": "6.0.5",
