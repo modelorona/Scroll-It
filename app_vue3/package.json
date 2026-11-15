@@ -24,7 +24,7 @@
     "@vitejs/plugin-vue": "6.0.5",
     "@vue/eslint-config-typescript": "14.7.0",
     "esbuild": "0.28.2",
-    "eslint": "9.39.4",
+    "eslint": "10.14.0",
     "eslint-plugin-n": "17.24.0",
     "eslint-plugin-vue": "10.8.0",
     "eslint-plugin-vuetify": "2.7.2",
